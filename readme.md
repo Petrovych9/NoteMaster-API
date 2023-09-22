@@ -18,7 +18,7 @@
 # Features
 1. 
 
-# Docx
+# Docs
 
 -
 ## Built With 
