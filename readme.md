@@ -1,6 +1,6 @@
 # Note Master API
 
-> A FastAPI-based RESTful API for managing simple text notes. Basic CRUD operations using FastAPI, database integration, and user authentication.
+> A FastAPI-based RESTful API for managing text notes. Basic CRUD operations using FastAPI, database integration, and user authentication.
 
 
 The NoteMaster-API project provides a platform for users to manage text notes with various features, including:
