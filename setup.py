@@ -12,5 +12,5 @@ setup(
         'starlette==0.27.0',
         'pydantic==2.3.0'
     ],
-    scripts=['app/main.py']
+    scripts=['app/main.py', 'scripts/create_db.py']
 )

@@ -27,7 +27,7 @@ class NoteStatus(Enum):
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(Integer),
+    id = Column(Integer, primary_key=True)
     email = Column(String)
     password = Column(String)
     nickname = Column(String)
@@ -37,7 +37,7 @@ class User(Base):
 class Note(Base):
     __tablename__ = 'notes'
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
     title = Column(String)
     content = Column(String)
     category = Column(String)
@@ -48,5 +48,5 @@ class AuthToken(Base):
     __tablename__ = 'auth_token'
     id = Column(Integer, primary_key=True)
     token = Column(String)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
     created_at = Column(String, default=datetime.utcnow())
