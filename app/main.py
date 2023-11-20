@@ -1,22 +1,13 @@
 from fastapi import FastAPI
-from models.notes import Note
-
-app = FastAPI(
-    title='NoteMaster-API'
-)
+from app.handlers import auth_router
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+def get_app() -> FastAPI:
+    appr = FastAPI(
+        title='NoteMaster-API'
+    )
+    appr.include_router(auth_router)
+    return appr
 
 
-@app.post("/notes/")
-async def create_note(note: Note):
-    return note
-
-
-@app.get("/notes/")
-async def show_all_notes():
-    notes = {}
-    return notes
+app = get_app()
