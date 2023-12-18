@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    container_name: note-master-api
+    ports:
+      - "8000:000"
+    command: bash -c "uvicorn app.main:app"
+    env_file:
+      - .env
+    volumes:
+      - ./note_master.db:/app/note_master.db:delegated

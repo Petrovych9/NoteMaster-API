@@ -6,6 +6,7 @@ from starlette import status
 from app.forms import UserLoginForm, UserCreateForm
 from app.models import connect_db, User, AuthToken
 
+from app.auth import check_auth_token
 from app.utilts import get_pass_hash
 
 auth_router = APIRouter()  # todo what is it
@@ -24,6 +25,8 @@ async def login(
     db.add(auth_token)
     db.commit()
     return {"status": 'OK', 'auth_token': auth_token.token}
+
+
 #     "email": "test1@gmail.cpom",
 #     "password": "string"
 
@@ -32,7 +35,8 @@ async def create_user(
         user_form: UserCreateForm = Body(..., embed=True),
         db=Depends(connect_db)
 ):
-    is_user_exist = db.query(User.id).filter(User.email == user_form.email).one_or_none()
+    is_user_exist = db.query(User.id).filter(
+        User.email == user_form.email).one_or_none()
     if is_user_exist:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -49,4 +53,17 @@ async def create_user(
     return {
         "status": 'OK',
         "user_id": new_user.id
-        }
+    }
+
+
+@auth_router.get('/user1', name='user: get')
+async def get_user(
+        token: AuthToken = Depends(check_auth_token),
+        db=Depends(connect_db)
+):
+    user = db.query(User).filter(User.id == token.user_id).one_or_none()
+    return {
+        'id': user.id,
+        'email': user.email,
+        'nickname': user.nickname
+    }
