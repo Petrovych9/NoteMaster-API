@@ -31,7 +31,7 @@ class User(Base):
     email = Column(String)
     password = Column(String)
     nickname = Column(String)
-    created_at = Column(String, default=datetime.utcnow())
+    created_at = Column(String, default=datetime.now())
 
 
 class Note(Base):
@@ -49,4 +49,4 @@ class AuthToken(Base):
     id = Column(Integer, primary_key=True)
     token = Column(String)
     user_id = Column(Integer, ForeignKey('users.id'))
-    created_at = Column(String, default=datetime.utcnow())
+    created_at = Column(String, default=datetime.now())

@@ -1,17 +1,18 @@
 import uuid
 
-from fastapi import APIRouter, Body, Depends        # todo what is it
+from fastapi import APIRouter, Body, Depends, HTTPException  # todo what is it
+from starlette import status
 
-from app.forms import UserLoginForm
+from app.forms import UserLoginForm, UserCreateForm
 from app.models import connect_db, User, AuthToken
 
-from utilts import get_pass_hash
+from app.utilts import get_pass_hash
 
 auth_router = APIRouter()  # todo what is it
 
 
 @auth_router.post('/login', name='user: login')
-def login(
+async def login(
         user_form: UserLoginForm = Body(..., embed=True),
         db=Depends(connect_db)
 ):
@@ -22,4 +23,30 @@ def login(
     auth_token = AuthToken(token=str(uuid.uuid4()), user_id=user.id)
     db.add(auth_token)
     db.commit()
-    return {"status": 'OK'}
+    return {"status": 'OK', 'auth_token': auth_token.token}
+#     "email": "test1@gmail.cpom",
+#     "password": "string"
+
+@auth_router.post('/user', name='user: create')
+async def create_user(
+        user_form: UserCreateForm = Body(..., embed=True),
+        db=Depends(connect_db)
+):
+    is_user_exist = db.query(User.id).filter(User.email == user_form.email).one_or_none()
+    if is_user_exist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='User already exist',
+        )
+    new_user = User(
+        email=user_form.email,
+        password=get_pass_hash(user_form.password),
+        nickname=user_form.nickname
+    )
+
+    db.add(new_user)
+    db.commit()
+    return {
+        "status": 'OK',
+        "user_id": new_user.id
+        }

@@ -1,6 +1,6 @@
 from hashlib import sha256
 
-from config import SECRET_KEY
+from app.config import SECRET_KEY
 
 
 def get_pass_hash(password: str) -> str:
