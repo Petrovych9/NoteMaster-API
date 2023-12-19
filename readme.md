@@ -54,6 +54,16 @@ The project is built using the following technologies:
    ```
    git clone git@github.com:Petrovych9/NoteMaster-API.git
    ```
+### With docker file
+```
+    docker build -t note-master-api .
+```
+```
+    docker run -p 8000:8000 note-master-api
+```
+
+### OR
+
 ### 2. Create a virtual environment and activate it:
    ```
    python -m venv venv
