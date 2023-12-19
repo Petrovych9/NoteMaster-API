@@ -56,7 +56,7 @@ async def create_user(
     }
 
 
-@auth_router.get('/user1', name='user: get')
+@auth_router.get('/user', name='user: get')
 async def get_user(
         token: AuthToken = Depends(check_auth_token),
         db=Depends(connect_db)
@@ -67,3 +67,8 @@ async def get_user(
         'email': user.email,
         'nickname': user.nickname
     }
+
+
+@auth_router.get('/', name='root')
+def root():
+    return status.HTTP_200_OK
