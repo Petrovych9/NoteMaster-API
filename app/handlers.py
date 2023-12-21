@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Body, Depends, HTTPException  # todo what is it
-from starlette import status
+from fastapi import status
 
 from app.forms import UserLoginForm, UserCreateForm
 from app.models import connect_db, User, AuthToken
@@ -14,12 +14,12 @@ auth_router = APIRouter()  # todo what is it
 
 @auth_router.post(BasicUrls.LOGIN.value, name='user: login')
 async def login(
-        user_form: UserLoginForm = Body(..., embed=True),
+        user_form: UserLoginForm,
         db=Depends(connect_db)
 ):
     user = db.query(User).filter(User.email == user_form.email).one_or_none()
     if not user or get_pass_hash(user_form.password) != user.password:
-        return 500
+        return 500   # TODO make better response
 
     auth_token = AuthToken(token=str(uuid.uuid4()), user_id=user.id)
     db.add(auth_token)
@@ -32,7 +32,7 @@ async def login(
 
 @auth_router.post(UserUrls.USER.value, name='user: create')
 async def create_user(
-        user_form: UserCreateForm = Body(..., embed=True),
+        user_form: UserCreateForm,
         db=Depends(connect_db)
 ):
     is_user_exist = db.query(User.id).filter(
@@ -51,7 +51,7 @@ async def create_user(
     db.add(new_user)
     db.commit()
     return {
-        "status": 'OK',
+        "status": status.HTTP_201_CREATED,
         "user_id": new_user.id
     }
 
