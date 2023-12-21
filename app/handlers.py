@@ -5,14 +5,14 @@ from starlette import status
 
 from app.forms import UserLoginForm, UserCreateForm
 from app.models import connect_db, User, AuthToken
-
+from app.urls import BasicUrls, UserUrls, NoteUrls
 from app.auth import check_auth_token
 from app.utilts import get_pass_hash
 
 auth_router = APIRouter()  # todo what is it
 
 
-@auth_router.post('/login', name='user: login')
+@auth_router.post(BasicUrls.LOGIN.value, name='user: login')
 async def login(
         user_form: UserLoginForm = Body(..., embed=True),
         db=Depends(connect_db)
@@ -30,7 +30,7 @@ async def login(
 #     "email": "test1@gmail.cpom",
 #     "password": "string"
 
-@auth_router.post('/user', name='user: create')
+@auth_router.post(UserUrls.USER.value, name='user: create')
 async def create_user(
         user_form: UserCreateForm = Body(..., embed=True),
         db=Depends(connect_db)
@@ -56,7 +56,7 @@ async def create_user(
     }
 
 
-@auth_router.get('/user', name='user: get')
+@auth_router.get(UserUrls.USER.value, name='user: get')
 async def get_user(
         token: AuthToken = Depends(check_auth_token),
         db=Depends(connect_db)
@@ -69,6 +69,6 @@ async def get_user(
     }
 
 
-@auth_router.get('/', name='root')
+@auth_router.get(BasicUrls.ROOT.value, name='root')
 def root():
     return status.HTTP_200_OK
