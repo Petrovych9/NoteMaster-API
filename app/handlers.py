@@ -4,7 +4,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException  # todo what is it
 from fastapi import status
 
 from app.forms import UserLoginForm, UserCreateForm
-from app.models import connect_db, User, AuthToken
+from app.models import connect_db, User, AuthToken, ErrorResponse
 from app.urls import BasicUrls, UserUrls, NoteUrls
 from app.auth import check_auth_token
 from app.utilts import get_pass_hash
@@ -18,12 +18,25 @@ async def login(
         db=Depends(connect_db)
 ):
     user = db.query(User).filter(User.email == user_form.email).one_or_none()
-    if not user or get_pass_hash(user_form.password) != user.password:
-        return 500   # TODO make better response
-
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=ErrorResponse.INVALID_EMAIL
+        )
+    elif get_pass_hash(user_form.password) != user.password:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=ErrorResponse.INVALID_PASSWORD
+        )
     auth_token = AuthToken(token=str(uuid.uuid4()), user_id=user.id)
-    db.add(auth_token)
-    db.commit()
+    try:
+        db.add(auth_token)
+        db.commit()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{ErrorResponse.INTERNAL_ERR0R} | {e}"
+        )
     return {"status": 'OK', 'auth_token': auth_token.token}
 
 
@@ -40,7 +53,7 @@ async def create_user(
     if is_user_exist:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='User already exist',
+            detail=ErrorResponse.USER_ALREADY_EXIST,
         )
     new_user = User(
         email=user_form.email,

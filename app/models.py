@@ -50,3 +50,11 @@ class AuthToken(Base):
     token = Column(String)
     user_id = Column(Integer, ForeignKey('users.id'))
     created_at = Column(String, default=datetime.now())
+
+
+class ErrorResponse(str, Enum):
+    INVALID_EMAIL = 'INVALID_EMAIL'
+    INVALID_PASSWORD = 'INVALID_PASSWORD'
+    USER_ALREADY_EXIST = 'USER_ALREADY_EXIST'
+    INTERNAL_ERR0R = 'INTERNAL_ERR0R'
+

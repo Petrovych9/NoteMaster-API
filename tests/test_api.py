@@ -5,6 +5,7 @@ from bson import ObjectId
 
 from app.main import app as web_app
 from app.urls import BasicUrls, UserUrls, NoteUrls
+from app.models import ErrorResponse
 
 
 class APITestCase(TestCase):
@@ -24,9 +25,14 @@ class APITestCase(TestCase):
             "nickname": "test_nickname"
         }
 
-        response = self.client.post(url=UserUrls.USER.value,
-                                    json=user_data).json()
-        self.assertEqual(response.get('detail'), "User already exist")
+        response = self.client.post(
+            url=UserUrls.USER.value,
+            json=user_data
+        ).json()
+        self.assertEqual(
+            response.get('detail'),
+            ErrorResponse.USER_ALREADY_EXIST
+        )
 
         # create new user
         user_data = {
@@ -71,8 +77,8 @@ class APITestCase(TestCase):
             password="strin$g"
         )
         response = self.client.post(url=BasicUrls.LOGIN.value, json=data)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(
-            response.json(),
-            status.HTTP_500_INTERNAL_SERVER_ERROR
+            response.json().get('detail'),
+            ErrorResponse.INVALID_EMAIL
         )
