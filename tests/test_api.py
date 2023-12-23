@@ -1,30 +1,41 @@
 from unittest import TestCase
-from fastapi.testclient import TestClient
-from fastapi import status
 from bson import ObjectId
 
-from app.main import app as web_app
-from app.urls import BasicUrls, UserUrls, NoteUrls
+from fastapi import status
+from fastapi.testclient import TestClient
+
+from app.db import get_db_session, override_get_db_session
+from app.main import app
 from app.models import ErrorResponse
+from app.urls import BasicUrls, UserUrls, NoteUrls
 
 
 class APITestCase(TestCase):
 
     def setUp(self):
-        self.client = TestClient(web_app)
+        app.dependency_overrides[get_db_session] = override_get_db_session
+        self.client = TestClient(app)
 
     def test_main_url(self):
         response = self.client.get(BasicUrls.ROOT.value)
         self.assertEqual(response.status_code, 200)
 
     def test_create_user(self):
-        # try to add existing user
+        # create new user
         user_data = {
-            "email": "test@example.com",
-            "password": "test_password",
+            "email": f"test_test@example.com",
+            "password": "test_password1",
             "nickname": "test_nickname"
         }
 
+        response = self.client.post(
+            url=UserUrls.USER.value,
+            json=user_data
+        ).json()
+        self.assertEqual(response.get('status'), status.HTTP_201_CREATED)
+        self.assertIsNotNone(response.get('user_id'))
+
+        # try to add existing user
         response = self.client.post(
             url=UserUrls.USER.value,
             json=user_data
@@ -34,36 +45,23 @@ class APITestCase(TestCase):
             ErrorResponse.USER_ALREADY_EXIST
         )
 
-        # create new user
-        user_data = {
-            "email": f"test_test{ObjectId()}@example.com",
+    def test_get_user(self):
+        # Ask for non existing user
+        data = dict(token='17cca16a-87d6-42ss55-bc0c-bc830e73c8b8')
+# todo need to create crud for user
+        response = self.client.get(url=UserUrls.USER.value, params=data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)  # wrong token
+        # response = response.json()
+        # self.assertIsNotNone(response.get('id'))
+        # self.assertIsNotNone(response.get('email'))
+        # self.assertIsNotNone(response.get('nickname'))
+
+    def test_login(self):
+        data = {
+            "email": f"test_test@example.com",
             "password": "test_password1",
             "nickname": "test_nickname"
         }
-
-        response = self.client.post(
-            url=UserUrls.USER.value,
-            json=user_data
-        ).json()
-        print(response)
-        self.assertEqual(response.get('status'), status.HTTP_201_CREATED)
-        self.assertIsNotNone(response.get('user_id'))
-
-    def test_get_user(self):
-        data = dict(token='17cca16a-87d6-4255-bc0c-bc830e73c8b8')
-
-        response = self.client.get(url=UserUrls.USER.value, params=data)
-        self.assertEqual(response.status_code, 200)
-        response = response.json()
-        self.assertIsNotNone(response.get('id'))
-        self.assertIsNotNone(response.get('email'))
-        self.assertIsNotNone(response.get('nickname'))
-
-    def test_login(self):
-        data = dict(
-            email="test1@gmail.cpom",
-            password="string"
-        )
         response = self.client.post(
             url=BasicUrls.LOGIN.value,
             json=data

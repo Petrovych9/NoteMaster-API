@@ -1,21 +1,21 @@
 import uuid
 
-from fastapi import APIRouter, Body, Depends, HTTPException  # todo what is it
-from fastapi import status
+from fastapi import APIRouter, status, Depends, HTTPException, Body
 
 from app.forms import UserLoginForm, UserCreateForm
-from app.models import connect_db, User, AuthToken, ErrorResponse
+from app.models import User, AuthToken, ErrorResponse
+from app.db import get_db_session
 from app.urls import BasicUrls, UserUrls, NoteUrls
 from app.auth import check_auth_token
 from app.utilts import get_pass_hash
 
-auth_router = APIRouter()  # todo what is it
+auth_router = APIRouter()  # todo create different routes groups + v1 before
 
 
 @auth_router.post(BasicUrls.LOGIN.value, name='user: login')
 async def login(
         user_form: UserLoginForm,
-        db=Depends(connect_db)
+        db=Depends(get_db_session)
 ):
     user = db.query(User).filter(User.email == user_form.email).one_or_none()
     if not user:
@@ -45,8 +45,8 @@ async def login(
 
 @auth_router.post(UserUrls.USER.value, name='user: create')
 async def create_user(
-        user_form: UserCreateForm,
-        db=Depends(connect_db)
+        user_form: UserCreateForm = Body(),
+        db=Depends(get_db_session)  # todo seems like its in request body in swagger
 ):
     is_user_exist = db.query(User.id).filter(
         User.email == user_form.email).one_or_none()
@@ -72,9 +72,14 @@ async def create_user(
 @auth_router.get(UserUrls.USER.value, name='user: get')
 async def get_user(
         token: AuthToken = Depends(check_auth_token),
-        db=Depends(connect_db)
+        db=Depends(get_db_session)
 ):
     user = db.query(User).filter(User.id == token.user_id).one_or_none()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ErrorResponse.USER_NOT_FOUND
+        )
     return {
         'id': user.id,
         'email': user.email,

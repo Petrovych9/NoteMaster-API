@@ -1,21 +1,11 @@
 from datetime import datetime
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Enum
-from sqlalchemy.orm import Session
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 
-from app.config import DATABASE_URL
-
-Base = declarative_base()
+from app.db import Base
 
 
-def connect_db():
-    engine = create_engine(
-        DATABASE_URL,
-        connect_args={}
-    )
-    session = Session(bind=engine.connect())
-    return session
+# todo fix creating models according to sqlalchemy
 
 
 class NoteStatus(Enum):
@@ -55,6 +45,8 @@ class AuthToken(Base):
 class ErrorResponse(str, Enum):
     INVALID_EMAIL = 'INVALID_EMAIL'
     INVALID_PASSWORD = 'INVALID_PASSWORD'
+    INVALID_TOKEN = 'INVALID_TOKEN'
     USER_ALREADY_EXIST = 'USER_ALREADY_EXIST'
+    USER_NOT_FOUND = 'USER_NOT_FOUND'
     INTERNAL_ERR0R = 'INTERNAL_ERR0R'
 
