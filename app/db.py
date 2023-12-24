@@ -1,3 +1,4 @@
+from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
@@ -15,8 +16,8 @@ def get_engine(url: str = DATABASE_URL):
     )
 
 
-def get_db_session(engine):
-    session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def get_db_session():
+    session = sessionmaker(autocommit=False, autoflush=False, bind=get_engine())
     return session
 
 
@@ -25,7 +26,8 @@ def get_test_engine():
 
 
 def get_test_session():
-    return get_db_session(get_test_engine())
+    session = sessionmaker(autocommit=False, autoflush=False, bind=get_engine(DATABASE_URL_TEST))
+    return session
 
 
 def override_get_db_session():
