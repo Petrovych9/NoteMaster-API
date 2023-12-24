@@ -11,13 +11,15 @@ from app.urls import BasicUrls, UserUrls, NoteUrls
 
 
 class APITestCase(TestCase):
+    api = '/v1/'
+    users = 'users'   # todo create normal urls, centralizeted
 
     def setUp(self):
         app.dependency_overrides[get_db_session] = override_get_db_session
         self.client = TestClient(app)
 
     def test_main_url(self):
-        response = self.client.get(BasicUrls.ROOT.value)
+        response = self.client.get(self.api)
         self.assertEqual(response.status_code, 200)
 
     def test_create_user(self):
@@ -27,9 +29,9 @@ class APITestCase(TestCase):
             "password": "test_password1",
             "nickname": "test_nickname"
         }
-
+        print(self.api + self.users + UserUrls.USER.value)
         response = self.client.post(
-            url=UserUrls.USER.value,
+            url=self.api + self.users + UserUrls.USER.value,
             json=user_data
         ).json()
         self.assertEqual(response.get('status'), status.HTTP_201_CREATED)
@@ -37,7 +39,7 @@ class APITestCase(TestCase):
 
         # try to add existing user
         response = self.client.post(
-            url=UserUrls.USER.value,
+            url=self.api + self.users + UserUrls.USER.value,
             json=user_data
         ).json()
         self.assertEqual(
@@ -49,7 +51,7 @@ class APITestCase(TestCase):
         # Ask for non existing user
         data = dict(token='17cca16a-87d6-42ss55-bc0c-bc830e73c8b8')
 # todo need to create crud for user
-        response = self.client.get(url=UserUrls.USER.value, params=data)
+        response = self.client.get(url=self.api + self.users + UserUrls.USER.value, params=data)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)  # wrong token
         # response = response.json()
         # self.assertIsNotNone(response.get('id'))
@@ -63,7 +65,7 @@ class APITestCase(TestCase):
             "nickname": "test_nickname"
         }
         response = self.client.post(
-            url=BasicUrls.LOGIN.value,
+            url=self.api + self.users + BasicUrls.LOGIN.value,
             json=data
         ).json()
         self.assertEqual(response.get('status'), 'OK')
@@ -74,7 +76,10 @@ class APITestCase(TestCase):
             email="",
             password="strin$g"
         )
-        response = self.client.post(url=BasicUrls.LOGIN.value, json=data)
+        response = self.client.post(
+            url=self.api + self.users + BasicUrls.LOGIN.value,
+            json=data
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(
             response.json().get('detail'),

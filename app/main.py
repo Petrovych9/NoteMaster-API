@@ -1,10 +1,10 @@
 from functools import lru_cache
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, APIRouter
 from typing_extensions import Annotated
 
 from app.config import Settings
-from app.handlers import auth_router
+from app.handlers import users, notes, base
 
 
 @lru_cache
@@ -12,11 +12,20 @@ def get_settings():
     return Settings()
 
 
-def get_app(settings:  Annotated[Settings, Depends(get_settings)]) -> FastAPI:
+def get_app(settings: Annotated[Settings, Depends(get_settings)]) -> FastAPI:
     app = FastAPI(
         title=settings.app_name
     )
-    app.include_router(auth_router)
+    v1 = APIRouter(
+        prefix='/v1',
+        # tags=['v1'],
+    )
+    v1.include_router(base.base_router)
+    v1.include_router(users.users_router)
+    v1.include_router(notes.notes_router)
+
+    app.include_router(v1)
+
     return app
 
 

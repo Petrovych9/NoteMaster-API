@@ -1,18 +1,24 @@
 import uuid
 
-from fastapi import APIRouter, status, Depends, HTTPException, Body
+from fastapi import Depends, HTTPException, Body, APIRouter
+from starlette import status
 
-from app.forms import UserLoginForm, UserCreateForm
-from app.models import User, AuthToken, ErrorResponse
-from app.db import get_db_session
-from app.urls import BasicUrls, UserUrls, NoteUrls
 from app.auth import check_auth_token
+from app.db import get_db_session
+from app.forms import UserLoginForm, UserCreateForm
+from app.models import User, ErrorResponse, AuthToken
+from app.urls import BasicUrls, UserUrls
 from app.utilts import get_pass_hash
 
-auth_router = APIRouter()  # todo create different routes groups + v1 before
+#     "email": "test1@gmail.cpom",
+#     "password": "string"
+users_router = APIRouter(
+        prefix='/users',
+        tags=['users'],
+    )
 
 
-@auth_router.post(BasicUrls.LOGIN.value, name='user: login')
+@users_router.post(BasicUrls.LOGIN.value, name='user: login')
 async def login(
         user_form: UserLoginForm,
         db=Depends(get_db_session)
@@ -40,13 +46,10 @@ async def login(
     return {"status": 'OK', 'auth_token': auth_token.token}
 
 
-#     "email": "test1@gmail.cpom",
-#     "password": "string"
-
-@auth_router.post(UserUrls.USER.value, name='user: create')
+@users_router.post(UserUrls.USER.value, name='user: create')
 async def create_user(
         user_form: UserCreateForm = Body(),
-        db=Depends(get_db_session)  # todo seems like its in request body in swagger
+        db=Depends(get_db_session)
 ):
     is_user_exist = db.query(User.id).filter(
         User.email == user_form.email).one_or_none()
@@ -69,7 +72,7 @@ async def create_user(
     }
 
 
-@auth_router.get(UserUrls.USER.value, name='user: get')
+@users_router.get(UserUrls.USER.value, name='user: get')
 async def get_user(
         token: AuthToken = Depends(check_auth_token),
         db=Depends(get_db_session)
@@ -85,8 +88,3 @@ async def get_user(
         'email': user.email,
         'nickname': user.nickname
     }
-
-
-@auth_router.get(BasicUrls.ROOT.value, name='root')
-def root():
-    return status.HTTP_200_OK
