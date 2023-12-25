@@ -1,18 +1,14 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-
-from app.config import DATABASE_URL
-from app.db import Base
+from app.db import Base, get_engine
 
 
-def main():
-    engine = create_engine(DATABASE_URL)
-    session = Session(bind=engine.connect())
+def create_all_tables_in_main_db():
 
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=get_engine())
 
-    return session
+    current_function = create_all_tables_in_main_db.__name__
+    current_file = create_all_tables_in_main_db.__code__.co_filename
+    print(f"Script: {current_file} --------- DONE")
 
 
 if __name__ == '__main__':
-    main()
+    create_all_tables_in_main_db()

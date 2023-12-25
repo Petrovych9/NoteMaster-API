@@ -1,15 +1,8 @@
-from functools import lru_cache
-
 from fastapi import FastAPI, Depends, APIRouter
 from typing_extensions import Annotated
 
-from app.config import Settings
+from app.config import Settings, get_settings
 from app.handlers import users, notes, base
-
-
-@lru_cache
-def get_settings():
-    return Settings()
 
 
 def get_app(settings: Annotated[Settings, Depends(get_settings)]) -> FastAPI:
