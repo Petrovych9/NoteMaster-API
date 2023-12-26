@@ -7,18 +7,18 @@ from app.auth import check_auth_token
 from app.db import get_db_session
 from app.forms import UserLoginForm, UserCreateForm
 from app.models import User, ErrorResponse, AuthToken
-from app.urls import BasicUrls, UserUrls
 from app.utilts import get_pass_hash
+from app.config import get_settings
 
 #     "email": "test1@gmail.cpom",
 #     "password": "string"
 users_router = APIRouter(
-        prefix='/users',
+        prefix=get_settings().urls.users_prefix,
         tags=['users'],
     )
 
 
-@users_router.post(BasicUrls.LOGIN.value, name='user: login')
+@users_router.post(get_settings().urls.users_endpoints.login, name='user: login')
 async def login(
         user_form: UserLoginForm,
         db=Depends(get_db_session)
@@ -46,7 +46,7 @@ async def login(
     return {"status": 'OK', 'auth_token': auth_token.token}
 
 
-@users_router.post(UserUrls.USER.value, name='user: create')
+@users_router.post(get_settings().urls.users_endpoints.user, name='user: create')
 async def create_user(
         user_form: UserCreateForm = Body(),
         db=Depends(get_db_session)
@@ -72,7 +72,7 @@ async def create_user(
     }
 
 
-@users_router.get(UserUrls.USER.value, name='user: get')
+@users_router.get(get_settings().urls.users_endpoints.user, name='user: get')
 async def get_user(
         token: AuthToken = Depends(check_auth_token),
         db=Depends(get_db_session)

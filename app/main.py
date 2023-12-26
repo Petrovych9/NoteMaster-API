@@ -10,7 +10,7 @@ def get_app(settings: Annotated[Settings, Depends(get_settings)]) -> FastAPI:
         title=settings.app_name
     )
     v1 = APIRouter(
-        prefix='/v1',
+        prefix=settings.urls.api_version_prefix,
         # tags=['v1'],
     )
     v1.include_router(base.base_router)

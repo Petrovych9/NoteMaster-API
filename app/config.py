@@ -16,12 +16,38 @@ class Database(BaseSettings):
     secret_key: str = Field('SECRET_KEY', env='SECRET_KEY')
 
 
+class BaseEndpoints(BaseSettings):
+    root: str = '/'
+
+
+class UserEndpoints(BaseSettings):
+    login: str = '/login'
+    user: str = '/user123'
+
+
+class NoteEndpoints(BaseSettings):
+    pass
+
+
+class Urls(BaseSettings):
+    api_version_prefix: str = '/v1'
+    base_endpoints: BaseEndpoints = BaseEndpoints()
+
+    users_prefix: str = '/users'
+    users_endpoints: UserEndpoints = UserEndpoints()
+
+    notes_prefix: str = '/notes'
+    notes_endpoints: NoteEndpoints = NoteEndpoints()
+
+
 class Settings(BaseSettings):
     app_name: str = 'NoteMaster-API'
     db: Database = Database()
 
     db_url: str = f"sqlite:///{db.db_name}"
     test_db_url: str = f"sqlite:///{db.test_db_name}"
+
+    urls: Urls = Urls()
 
 
 @lru_cache
