@@ -19,7 +19,6 @@ users_router = APIRouter(
     )
 
 
-# todo error with user endpoint - petrovych instead of /user
 @users_router.post(get_settings().urls.users_endpoints.login, name='user: login')
 async def login(
         user_form: UserLoginForm,
