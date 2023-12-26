@@ -18,7 +18,9 @@ def get_engine(url: str = get_settings().db_url):
 
 def get_db_session():
     session = sessionmaker(autocommit=False, autoflush=False, bind=get_engine())
-    return session
+    try:
+        yield session()
+    finally: session().close()
 
 
 def get_test_engine():
