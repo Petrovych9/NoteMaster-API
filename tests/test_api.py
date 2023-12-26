@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.db import get_db_session, override_get_db_session
 from app.main import app
-from app.models import ErrorResponse
+from app.domain.error_models import ErrorResponse
 from app.config import get_settings
 
 
@@ -45,7 +45,7 @@ class APITestCase(TestCase):
             "password": "test_password1",
             "nickname": "test_nickname"
         }
-        endpoint = self.user_endpoints.user
+        endpoint = self.user_endpoints.user1
         response = self.client.post(
             url=self.api_version + self.users_prefix + endpoint,
             json=user_data
@@ -67,7 +67,7 @@ class APITestCase(TestCase):
         # Ask for non existing user
         data = dict(token='17cca16a-87d6-42ss55-bc0c-bc830e73c8b8')
 # todo need to create crud for user
-        endpoint =  self.user_endpoints.user
+        endpoint = self.user_endpoints.user1
         response = self.client.get(
             url=self.api_version + self.users_prefix + endpoint,
             params=data

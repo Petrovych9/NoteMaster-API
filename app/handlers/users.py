@@ -5,8 +5,9 @@ from starlette import status
 
 from app.auth import check_auth_token
 from app.db import get_db_session
-from app.forms import UserLoginForm, UserCreateForm
-from app.models import User, ErrorResponse, AuthToken
+from app.domain.users_models import UserLoginForm, UserCreateForm
+from app.models import User, AuthToken
+from app.domain.error_models import ErrorResponse
 from app.utilts import get_pass_hash
 from app.config import get_settings
 
@@ -18,6 +19,7 @@ users_router = APIRouter(
     )
 
 
+# todo error with user endpoint - petrovych instead of /user
 @users_router.post(get_settings().urls.users_endpoints.login, name='user: login')
 async def login(
         user_form: UserLoginForm,
@@ -46,7 +48,7 @@ async def login(
     return {"status": 'OK', 'auth_token': auth_token.token}
 
 
-@users_router.post(get_settings().urls.users_endpoints.user, name='user: create')
+@users_router.post(get_settings().urls.users_endpoints.user1, name='user: create')
 async def create_user(
         user_form: UserCreateForm = Body(),
         db=Depends(get_db_session)
@@ -72,7 +74,7 @@ async def create_user(
     }
 
 
-@users_router.get(get_settings().urls.users_endpoints.user, name='user: get')
+@users_router.get(get_settings().urls.users_endpoints.user1, name='user: get')
 async def get_user(
         token: AuthToken = Depends(check_auth_token),
         db=Depends(get_db_session)

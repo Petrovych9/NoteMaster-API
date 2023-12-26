@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 
 from app.models import AuthToken
 from app.db import get_db_session
-from app.models import ErrorResponse
+from app.domain.error_models import ErrorResponse
 
 
 def check_auth_token(

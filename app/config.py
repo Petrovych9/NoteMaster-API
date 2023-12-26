@@ -22,7 +22,7 @@ class BaseEndpoints(BaseSettings):
 
 class UserEndpoints(BaseSettings):
     login: str = '/login'
-    user: str = '/user123'
+    user1: str = '/user'
 
 
 class NoteEndpoints(BaseSettings):
