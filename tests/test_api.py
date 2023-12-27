@@ -28,12 +28,6 @@ class APITestCase(TestCase):
         app.dependency_overrides[get_db_session] = override_get_db_session
         self.client = TestClient(app)
 
-    def __fetch_response(self, endpoint: str, prefix: str, data: dict):
-        return self.client.post(
-            url=self.api_version + prefix + endpoint,
-            json=data
-        )# TODO rebuild all according to this fetch
-
     def test_main_url(self):
         response = self.client.get(self.api_version + self.base_endpoints.root)
         self.assertEqual(response.status_code, 200)
