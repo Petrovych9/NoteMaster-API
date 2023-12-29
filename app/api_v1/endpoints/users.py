@@ -10,6 +10,7 @@ from app.models import User, AuthToken
 from app.domain.error_models import ErrorResponse
 from app.utilts import get_pass_hash
 from app.config import get_settings
+from app.domain.users_crud import UsersCrud
 
 #     "email": "test1@gmail.cpom",
 #     "password": "string"

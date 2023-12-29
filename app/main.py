@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, APIRouter
 from typing_extensions import Annotated
 
 from app.config import Settings, get_settings
-from app.handlers import users, notes, base
+from app.api_v1.endpoints import base, notes, users
 
 
 def get_app(settings: Annotated[Settings, Depends(get_settings)]) -> FastAPI:
