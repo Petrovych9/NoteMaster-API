@@ -1,4 +1,4 @@
-from fastapi import Depends
+from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
@@ -16,11 +16,13 @@ def get_engine(url: str = get_settings().db_url):
     )
 
 
+@contextmanager
 def get_db_session():
-    session = sessionmaker(autocommit=False, autoflush=False, bind=get_engine())
+    session = sessionmaker(autocommit=False, autoflush=False, bind=get_engine())()
     try:
-        yield session()
-    finally: session().close()
+        yield session
+    finally:
+        session.close()
 
 
 def get_test_engine():
