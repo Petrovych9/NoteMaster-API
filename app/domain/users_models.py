@@ -10,3 +10,14 @@ class UserLoginForm(BaseModel):
 
 class UserCreateForm(UserLoginForm):
     nickname: Optional[str] = None
+
+
+class UserModelCreate(UserCreateForm):
+    pass
+
+
+class UserModel(UserModelCreate):
+    id: int
+    created_at: str
+
+
