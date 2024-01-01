@@ -52,11 +52,11 @@ class DatabaseCrud(ABCCrud):
                 return item.id
 
         except IntegrityError as e:
-            f"IntegrityError: {e}"
+            raise f"IntegrityError: {e}"
         except DataError as e:
-            f"DataError: issue with the data you are trying to insert |  {e}"
+            raise f"DataError: issue with the data you are trying to insert |  {e}"
         except DBAPIError as e:
-            f"DBAPIError: raised for issues such as connection problems | {e}"
+            raise f"DBAPIError: raised for issues such as connection problems | {e}"
         except Exception as e:
             raise f"Unexpected error: {e}"
 
