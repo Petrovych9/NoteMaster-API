@@ -24,7 +24,8 @@ class UsersCrud:
         )
         user_id = self.user_db.create(user.model_dump())
         return user_id
-
+# todo add create user_auth token
+# todo add get user_auth token
     def update(self, user_id: int, field_value: dict):
         updated_user_id = self.user_db.update(
             item_id=user_id,
