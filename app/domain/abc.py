@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
 
-from sqlalchemy import insert, delete, select
-from sqlalchemy.schema import Table
+from sqlalchemy import insert, delete, select, update
+from typing import Type
+
+from sqlalchemy.exc import IntegrityError, DataError, DBAPIError
+
+from app.models import Base
 
 from app.db import get_db_session
 from app.models import User, Note
@@ -31,37 +35,47 @@ class ABCCrud(ABC):
 
 
 class DatabaseCrud(ABCCrud):
-    table: Table = None
+    table: Type[Base] = None
 
-    def get(self, **filters):
+    def get(self, field_value: dict):
         with get_db_session() as session:
-            q = select(self.table).filter_by(**filters)
+            q = select(self.table).filter_by(**field_value)
             res = session.execute(q)
-            return res.all()
+            return res.scalar()
 
     def create(self, data: dict):
+        try:
+            with get_db_session() as session:
+                item = self.table(**data)
+                session.add(item)
+                session.commit()
+                return item.id
+
+        except IntegrityError as e:
+            f"IntegrityError: {e}"
+        except DataError as e:
+            f"DataError: issue with the data you are trying to insert |  {e}"
+        except DBAPIError as e:
+            f"DBAPIError: raised for issues such as connection problems | {e}"
+        except Exception as e:
+            raise f"Unexpected error: {e}"
+
+    def update(self, item_id: int, field_value: dict):
         with get_db_session() as session:
-            q = insert(self.table).values(**data).returning(self.table.id)
+            q = update(self.table).filter_by(id=item_id).values(**field_value).returning(self.table.id)
+            res = session.execute(q)
+            res = res.fetchone()
+            session.commit()
+
+            return res
+
+    def delete(self, item_id: int):
+        with get_db_session() as session:
+            q = delete(self.table).filter_by(id=item_id)
             res = session.execute(q)
             session.commit()
 
-            return res.scalar_one()
-
-    def update(self, item_id: int, field: str, value):
-        with get_db_session() as session:
-            item = session.get(self.table, item_id)
-            item.field = value
-            session.commit()
-
-            return item
-
-    def delete(self, item_id):
-        with get_db_session() as session:
-            q = delete(self.table).where(self.table.c.id == item_id)
-            session.execute(q)
-            session.commit()
-
-            return
+            return res
 
 
 class UsersDatabaseCrud(DatabaseCrud):
@@ -70,4 +84,3 @@ class UsersDatabaseCrud(DatabaseCrud):
 
 class NotesDatabaseCrud(DatabaseCrud):
     table = Note
-
