@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError, DataError, DBAPIError
 from app.models import Base
 
 from app.db import get_db_session
-from app.models import User, Note
+from app.models import User, Note, AuthToken
 
 
 class ABCCrud(ABC):
@@ -84,3 +84,7 @@ class UsersDatabaseCrud(DatabaseCrud):
 
 class NotesDatabaseCrud(DatabaseCrud):
     table = Note
+
+
+class AuthTokenDatabaseCrud(DatabaseCrud):
+    table = AuthToken

@@ -11,6 +11,8 @@ from app.domain.error_models import ErrorResponse
 from app.utilts import get_pass_hash
 from app.config import get_settings
 from app.domain.users_crud import get_users_crud, UsersCrud
+from app.domain.token_crud import AuthTokenCrud, get_token_crud
+
 
 #     "email": "test1@gmail.cpom",
 #     "password": "string"
@@ -23,9 +25,10 @@ users_router = APIRouter(
 @users_router.post(get_settings().urls.users_endpoints.login, name='user: login')
 async def login(
         user_form: UserLoginForm,
-        db: UsersCrud = Depends(get_users_crud)
+        user_db: UsersCrud = Depends(get_users_crud),
+        token_db: AuthTokenCrud = Depends(get_token_crud)
 ):
-    user = db.get_by_email(user_email=user_form.email)
+    user = user_db.get_by_email(user_email=user_form.email)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -37,17 +40,17 @@ async def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=ErrorResponse.INVALID_PASSWORD
         )
-    # auth_token = AuthToken(token=str(uuid.uuid4()), user_id=user.id)
-    # try:
-    #     db.add(auth_token)
-    #     db.commit()
-    # except Exception as e:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail=f"{ErrorResponse.INTERNAL_ERR0R} | {e}"
-    #     )
-    # return {"status": 'OK', 'auth_token': auth_token.token}
-    return {"status": 'OK', 'auth_token': 'soon', 'user_id': user.id}
+    auth_token_id = token_db.create(token=str(uuid.uuid4()), user_id=user.id)
+    if not auth_token_id:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{ErrorResponse.INTERNAL_ERR0R}"
+        )
+    return {
+        "status": 'OK',
+        'auth_token_id': f'{auth_token_id}',
+        'user_id': user.id
+    }
 
 
 @users_router.post(get_settings().urls.users_endpoints.user1, name='user: create')
