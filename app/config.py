@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     db: Database = Database()
 
     db_url: str = f'sqlite:///{os.path.join(db.absolute_root_dir, db.db_name)}'
-    test_db_url: str = f"sqlite:///{db.test_db_name}"
+    test_db_url: str = f"sqlite:///{os.path.join(db.absolute_root_dir, db.test_db_name)}"
 
     urls: Urls = Urls()
 
