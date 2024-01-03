@@ -6,10 +6,17 @@ class AuthTokenCrud:
     def __init__(self, token_db: AuthTokenDatabaseCrud):
         self.token_db = token_db
 
-    def get_by_id(self, token_id: int = None, user_id: int = None):
+    def get_by_field(
+            self,
+            token_id: int = None,
+            user_id: int = None,
+            token: str = None
+    ):
         field_value = dict(user_id=user_id)
         if token_id:
             field_value = dict(id=token_id)
+        if token:
+            field_value = dict(token=token)
 
         token = self.token_db.get(field_value)
         return token

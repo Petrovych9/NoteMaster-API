@@ -56,16 +56,15 @@ async def login(
 @users_router.post(get_settings().urls.users_endpoints.user1, name='user: create')
 async def create_user(
         user_form: UserCreateForm = Body(),
-        db: UsersCrud = Depends(get_users_crud)
+        user_db: UsersCrud = Depends(get_users_crud)
 ):
-    # is_user_exist = db.query(User.id).filter(
-    #     User.email == user_form.email).one_or_none()
-    # if is_user_exist:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail=ErrorResponse.USER_ALREADY_EXIST,
-    #     )
-    user_id = db.create(
+    is_user_exist = user_db.get_by_email(user_email=user_form.email)
+    if is_user_exist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ErrorResponse.USER_ALREADY_EXIST,
+        )
+    user_id = user_db.create(
         email=user_form.email,
         password=user_form.password,
         nickname=user_form.nickname
@@ -84,9 +83,12 @@ async def create_user(
 @users_router.get(get_settings().urls.users_endpoints.user1, name='user: get')
 async def get_user(
         token: AuthToken = Depends(check_auth_token),
-        db=Depends(get_db_session)
+        user_db: UsersCrud = Depends(get_users_crud),
+        token_db: AuthTokenCrud = Depends(get_token_crud)
 ):
-    user = db.query(User).filter(User.id == token.user_id).one_or_none()
+    user = user_db.get_by_id(
+        user_id=token_db.get_by_field(token=token.token).user_id
+    )
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
