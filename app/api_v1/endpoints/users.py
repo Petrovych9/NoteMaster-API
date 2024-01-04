@@ -34,8 +34,7 @@ async def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=ErrorResponse.INVALID_EMAIL
         )
-    # elif get_pass_hash(user_form.password) != user.password:
-    elif user.password != user_form.password:
+    elif get_pass_hash(user_form.password) != user.password:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=ErrorResponse.INVALID_PASSWORD
@@ -62,7 +61,7 @@ async def create_user(
     if is_user_exist:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ErrorResponse.USER_ALREADY_EXIST,
+            detail=ErrorResponse.EMAIL_ALREADY_EXIST,
         )
     user_id = user_db.create(
         email=user_form.email,
