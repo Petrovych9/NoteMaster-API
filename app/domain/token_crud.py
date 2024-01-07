@@ -1,3 +1,6 @@
+from fastapi import Depends
+from typing import Annotated
+# from app.db import get_db_session
 from app.domain.abc import AuthTokenDatabaseCrud
 from app.domain.auth_token_models import AuthTokenModelCreate
 
@@ -43,3 +46,7 @@ class AuthTokenCrud:
 
 def get_token_crud():
     return AuthTokenCrud(AuthTokenDatabaseCrud())
+
+
+def get_test_token_crud():
+    return AuthTokenCrud(AuthTokenDatabaseCrud(tests=True))

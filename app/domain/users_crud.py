@@ -1,3 +1,6 @@
+from fastapi import Depends
+from typing import Annotated
+# from app.db import get_db_session
 from app.domain.abc import UsersDatabaseCrud
 from app.domain.users_models import UserModelCreate, UserModel
 from app.utilts import get_pass_hash
@@ -22,8 +25,8 @@ class UsersCrud:
             email=email,
             password=get_pass_hash(password),
             nickname=nickname
-        )
-        user_id = self.user_db.create(user.model_dump())
+        ).model_dump()
+        user_id = self.user_db.create(user)
         return user_id
 
     def update(self, user_id: int, field_value: dict):
@@ -43,3 +46,7 @@ class UsersCrud:
 
 def get_users_crud():
     return UsersCrud(UsersDatabaseCrud())
+
+
+def get_test_users_crud():
+    return UsersCrud(UsersDatabaseCrud(tests=True))
