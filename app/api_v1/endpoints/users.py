@@ -4,7 +4,6 @@ from fastapi import Depends, HTTPException, Body, APIRouter
 from starlette import status
 
 from app.auth import check_auth_token
-from app.db import get_db_session
 from app.domain.users_models import UserLoginForm, UserCreateForm
 from app.models import User, AuthToken
 from app.domain.error_models import ErrorResponse
