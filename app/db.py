@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
@@ -12,31 +11,35 @@ class Base(DeclarativeBase):
 def get_engine(url: str = get_settings().db_url):
     return create_engine(
         url,
-        connect_args={"check_same_thread": False}  # only for SQLite
+        connect_args={"check_same_thread": False},  # only for SQLite
+        echo=False
     )
 
 
-@contextmanager
-def get_db_session():
-    session = sessionmaker(autocommit=False, autoflush=False, bind=get_engine())()
-    try:
-        yield session
-    finally:
-        session.close()
+class DatabaseSessionManager:
+    def __init__(self, test=False):
+        self.test = test
+        self.engine = get_engine()
+        self.test_engine = get_engine(get_settings().test_db_url)
+        self._sessionmaker = self._get_session()
 
+    def _get_session(self):
+        if self.test:
+            return sessionmaker(
+                autocommit=False,
+                autoflush=False,
+                bind=self.test_engine
+            )
 
-def get_test_engine():
-    return get_engine(get_settings().test_db_url)
+        return sessionmaker(
+            autocommit=False,
+            autoflush=False,
+            bind=self.engine
+        )
 
+    def __enter__(self):
+        self.session = self._sessionmaker()
+        return self.session
 
-def get_test_session():
-    session = sessionmaker(autocommit=False, autoflush=False, bind=get_test_engine())
-    return session
-
-
-def override_get_db_session():
-    try:
-        test_local_session = get_test_session()
-        yield test_local_session()
-    finally:
-        test_local_session().close()
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.session.close()
