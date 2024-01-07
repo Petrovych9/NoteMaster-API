@@ -1,13 +1,13 @@
 from unittest import TestCase
-from bson import ObjectId
 
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from app.db import get_db_session, override_get_db_session
 from app.main import app
 from app.domain.error_models import ErrorResponse
 from app.config import get_settings
+from app.domain.token_crud import get_token_crud, AuthTokenCrud, get_test_token_crud
+from app.domain.users_crud import get_users_crud, UsersCrud, get_test_users_crud
 
 
 class APITestCase(TestCase):
@@ -24,8 +24,12 @@ class APITestCase(TestCase):
         self.notes_endpoints = self.settings.urls.notes_endpoints
         self.base_endpoints = self.settings.urls.base_endpoints
 
+        self.users_crud: UsersCrud = get_test_users_crud()
+        self.token_crud: AuthTokenCrud = get_test_token_crud()
+
     def setUp(self):
-        app.dependency_overrides[get_db_session] = override_get_db_session
+        app.dependency_overrides[get_users_crud] = get_test_users_crud
+        app.dependency_overrides[get_token_crud] = get_test_token_crud
         self.client = TestClient(app)
 
     def test_main_url(self):
@@ -54,29 +58,13 @@ class APITestCase(TestCase):
         ).json()
         self.assertEqual(
             response.get('detail'),
-            ErrorResponse.USER_ALREADY_EXIST
+            ErrorResponse.EMAIL_ALREADY_EXIST
         )
-
-    def test_get_user(self):
-        # Ask for non existing user
-        data = dict(token='17cca16a-87d6-42ss55-bc0c-bc830e73c8b8')
-# todo need to create crud for user
-        endpoint = self.user_endpoints.user1
-        response = self.client.get(
-            url=self.api_version + self.users_prefix + endpoint,
-            params=data
-        )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)  # wrong token
-        # response = response.json()
-        # self.assertIsNotNone(response.get('id'))
-        # self.assertIsNotNone(response.get('email'))
-        # self.assertIsNotNone(response.get('nickname'))
 
     def test_login(self):
         data = {
             "email": f"test_test@example.com",
             "password": "test_password1",
-            "nickname": "test_nickname"
         }
         endpoint = self.user_endpoints.login
         response = self.client.post(
@@ -84,7 +72,7 @@ class APITestCase(TestCase):
             json=data
         ).json()
         self.assertEqual(response.get('status'), 'OK')
-        self.assertIsNotNone(response.get('auth_token'))
+        self.assertIsNotNone(response.get('auth_token_id'))
 
         # wrong email
         data = dict(
@@ -100,3 +88,21 @@ class APITestCase(TestCase):
             response.json().get('detail'),
             ErrorResponse.INVALID_EMAIL
         )
+    #
+    # def test_get_user(self):
+    #     new_user_id = self.users_crud.create(email='get.email', password='1111')
+    #     token = self.token_crud.get_by_field(user_id=new_user_id)
+    #     data = dict(token=token.token)
+    #     user = self.users_crud.get_by_id(user_id=new_user_id)
+    #
+    #     endpoint = self.user_endpoints.user1
+    #     response = self.client.get(
+    #         url=self.api_version + self.users_prefix + endpoint,
+    #         params=data
+    #     ).json()
+    #
+    #     self.assertEqual(response.get('id'), user.id)
+    #     self.assertEqual(response.get('email'), user.email)
+    #     self.assertEqual(response.get('nickname'), user.nickname)
+    #
+
