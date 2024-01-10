@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from functools import lru_cache
 
 from pydantic import Field
@@ -14,6 +15,14 @@ class Database(BaseSettings):
     db_name: str = Field('DB_NAME', env='DB_NAME')
     test_db_name: str = Field('TEST_DB_NAME', env='TEST_DB_NAME')
     secret_key: str = Field('SECRET_KEY', env='SECRET_KEY')
+
+
+class JwtToken(BaseSettings):
+    private_cert: str = str((Path(__file__).parent.parent / 'certs' / 'jwt-private.pem').read_text())
+    public_cert: str = str((Path(__file__).parent.parent / 'certs' / 'jwt-public.pem').read_text())
+    algo: str = 'RS256'             # pyjwt docs for public and private keys
+    life_time: int = 360
+    type: str = 'Bearer'
 
 
 class BaseEndpoints(BaseSettings):
@@ -48,6 +57,8 @@ class Settings(BaseSettings):
     test_db_url: str = f"sqlite:///{os.path.join(db.absolute_root_dir, db.test_db_name)}"
 
     urls: Urls = Urls()
+
+    jwt: JwtToken = JwtToken()
 
 
 @lru_cache
