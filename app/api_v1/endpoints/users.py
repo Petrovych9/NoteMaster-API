@@ -3,14 +3,17 @@ import uuid
 from fastapi import Depends, HTTPException, Body, APIRouter
 from starlette import status
 
-from app.auth import check_auth_token
+from app.domain.auth import check_auth_token
 from app.domain.users_models import UserLoginForm, UserCreateForm
-from app.models import User, AuthToken
+from app.models import AuthToken
 from app.domain.error_models import ErrorResponse
 from app.utilts import get_pass_hash
-from app.config import get_settings
+from app.config import get_settings, Settings
 from app.domain.users_crud import get_users_crud, UsersCrud
 from app.domain.token_crud import AuthTokenCrud, get_token_crud
+from app.domain.auth_models import TokenInfo
+from app.domain.auth import JwtToken
+from app.domain.validation import Validator
 
 
 #     "email": "test1@gmail.cpom",
@@ -21,34 +24,35 @@ users_router = APIRouter(
     )
 
 
-@users_router.post(get_settings().urls.users_endpoints.login, name='user: login')
+@users_router.post(get_settings().urls.users_endpoints.login, name='user: login (get jwt)')
 async def login(
         user_form: UserLoginForm,
-        user_db: UsersCrud = Depends(get_users_crud),
-        token_db: AuthTokenCrud = Depends(get_token_crud)
+        token_db: AuthTokenCrud = Depends(get_token_crud),
+        settings: Settings = Depends(get_settings),
+        jwt: JwtToken = Depends(JwtToken),
+        validator: Validator = Depends(Validator),
 ):
-    user = user_db.get_by_email(user_email=user_form.email)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=ErrorResponse.INVALID_EMAIL
+
+    is_valid, user_id = validator.check_user(
+        email=user_form.email,
+        password=user_form.password
+    )
+
+    token = jwt.encode(
+        payload=dict(
+            email=user_form.email,
+            password=get_pass_hash(user_form.password)
         )
-    elif get_pass_hash(user_form.password) != user.password:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=ErrorResponse.INVALID_PASSWORD
-        )
-    auth_token_id = token_db.create(token=str(uuid.uuid4()), user_id=user.id)
+    )
+
+    auth_token_id = token_db.create(token=token, user_id=user_id)
     if not auth_token_id:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"{ErrorResponse.INTERNAL_ERR0R}"
         )
-    return {
-        "status": 'OK',
-        'auth_token_id': f'{auth_token_id}',
-        'user_id': user.id
-    }
+
+    return TokenInfo(access_token=token, token_type=settings.jwt.type), user_id
 
 
 @users_router.post(get_settings().urls.users_endpoints.user1, name='user: create')
