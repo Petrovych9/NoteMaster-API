@@ -1,6 +1,5 @@
-from fastapi import Depends
 from typing import Annotated
-# from app.db import get_db_session
+
 from app.domain.abc import UsersDatabaseCrud
 from app.domain.users_models import UserModelCreate, UserModel
 from app.utilts import get_pass_hash
