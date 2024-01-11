@@ -1,9 +1,8 @@
-import uuid
 
-from fastapi import Depends, HTTPException, Body, APIRouter
-from starlette import status
+from fastapi import Depends, HTTPException, Body, APIRouter, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, \
+    OAuth2PasswordBearer
 
-from app.domain.auth import check_auth_token
 from app.domain.users_models import UserLoginForm, UserCreateForm
 from app.models import AuthToken
 from app.domain.error_models import ErrorResponse
@@ -84,7 +83,7 @@ async def create_user(
 
 @users_router.get(get_settings().urls.users_endpoints.user1, name='user: get')
 async def get_user(
-        token: AuthToken = Depends(check_auth_token),
+        token: AuthToken = Depends(Validator().check_auth_token),
         user_db: UsersCrud = Depends(get_users_crud),
         token_db: AuthTokenCrud = Depends(get_token_crud)
 ):
