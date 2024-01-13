@@ -22,6 +22,12 @@ users_router = APIRouter(
         tags=['users'],
     )
 
+oauth_scheme = OAuth2PasswordBearer(
+    tokenUrl=f"{get_settings().urls.users_endpoints.get_url(
+        endpoint=get_settings().urls.users_endpoints.login
+    )}"
+)
+
 
 @users_router.post(get_settings().urls.users_endpoints.login, name='user: login (get jwt)')
 async def login(
