@@ -16,7 +16,7 @@ class JwtToken:
         self.public_key = self.settings.jwt.public_cert
         self.private_key = self.settings.jwt.private_cert
         self.algorithm = self.settings.jwt.algo
-        self.life_time = self.settings.jwt.life_time
+        self.life_time_sec = self.settings.jwt.life_time_sec
 
     def encode(
             self,
@@ -31,7 +31,7 @@ class JwtToken:
             private_key = self.private_key
 
         now = datetime.datetime.utcnow()
-        expire = self.life_time + now
+        expire = self.life_time_sec + now
         payload.update(now=now, expire=expire)
 
         encoded_result = jwt.encode(

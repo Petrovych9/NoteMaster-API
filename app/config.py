@@ -21,7 +21,7 @@ class JwtToken(BaseSettings):
     private_cert: str = str((Path(__file__).parent.parent / 'certs' / 'jwt-private.pem').read_text())
     public_cert: str = str((Path(__file__).parent.parent / 'certs' / 'jwt-public.pem').read_text())
     algo: str = 'RS256'             # pyjwt docs for public and private keys
-    life_time: int = 360
+    life_time_sec: int = 360
     type: str = 'Bearer'
 
 
