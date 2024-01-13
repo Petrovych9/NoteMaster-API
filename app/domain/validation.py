@@ -39,7 +39,7 @@ class Validator:
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=ErrorResponse.INVALID_EMAIL
             )
-        elif get_pass_hash(password) != user.password:
+        elif password != user.password:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=ErrorResponse.INVALID_PASSWORD

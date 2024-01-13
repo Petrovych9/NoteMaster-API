@@ -37,16 +37,17 @@ async def login(
         jwt: JwtToken = Depends(JwtToken),
         validator: Validator = Depends(Validator),
 ):
+    hashed_pass = get_pass_hash(user_form.password)
 
     is_valid, user_id = validator.check_user(
         email=user_form.email,
-        password=user_form.password
+        password=hashed_pass
     )
 
     token = jwt.encode(
         payload=dict(
             email=user_form.email,
-            password=get_pass_hash(user_form.password)
+            password=hashed_pass
         )
     )
 
