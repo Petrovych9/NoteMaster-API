@@ -25,27 +25,38 @@ class JwtToken(BaseSettings):
     type: str = 'Bearer'
 
 
-class BaseEndpoints(BaseSettings):
-    root: str = '/'
+class UrlsBase(BaseSettings):
+    api_version_prefix: str = '/v1'
+
+    users_prefix: str = '/users'
+    notes_prefix: str = '/notes'
 
 
-class UserEndpoints(BaseSettings):
+class UserEndpoints(UrlsBase):
     login: str = '/login'
     user1: str = '/user'
 
+    def get_url(self, endpoint: str):
+        return f"{self.api_version_prefix + self.users_prefix + endpoint}"
 
-class NoteEndpoints(BaseSettings):
+
+class BaseEndpoints(UrlsBase):
+    root: str = '/'
+
+    def get_url(self, endpoint: str):
+        return f"{self.api_version_prefix + endpoint}"
+
+
+class NoteEndpoints(UrlsBase):
     pass
 
+    def get_url(self, endpoint: str):
+        return f"{self.api_version_prefix + self.notes_prefix + endpoint}"
 
-class Urls(BaseSettings):
-    api_version_prefix: str = '/v1'
+
+class Urls(UrlsBase):
     base_endpoints: BaseEndpoints = BaseEndpoints()
-
-    users_prefix: str = '/users'
     users_endpoints: UserEndpoints = UserEndpoints()
-
-    notes_prefix: str = '/notes'
     notes_endpoints: NoteEndpoints = NoteEndpoints()
 
 
