@@ -1,26 +1,23 @@
+from typing import Union, Tuple, Annotated
+
 from fastapi import Depends, HTTPException, status
 
 from app.domain.error_models import ErrorResponse
 from app.domain.auth_models import AuthTokenModelCreate
 from app.domain.users_crud import UsersCrud, get_users_crud
 from app.domain.token_crud import AuthTokenCrud, get_token_crud
-from app.domain.auth import JwtToken
+from app.domain.auth import JwtToken, get_jwt_token_class
 from app.utilts import get_pass_hash
-from app.config import get_settings
+from app.config import get_settings, Settings
 
 
 class Validator:
-    def __init__(
-            self,
-            user_db: UsersCrud = Depends(get_users_crud),
-            token_db: AuthTokenCrud = Depends(get_token_crud),
-            jwt: JwtToken = Depends(JwtToken)
-    ):
-        self.settings = Depends(get_settings)
+    def __init__(self):
+        self.settings = get_settings()
 
-        self.user_db = user_db
-        self.token_db = token_db
-        self.jwt = jwt
+        self.user_db = get_users_crud()
+        self.token_db = get_token_crud()
+        self.jwt = get_jwt_token_class()
 
     def check_user(
             self,
@@ -49,8 +46,14 @@ class Validator:
 
     def check_auth_token(
             self,
-            token: str,
-    ) -> AuthTokenModelCreate:
+            token: str | None = None,
+    ) -> Tuple[AuthTokenModelCreate, dict]:
+
+        if token == 'undefined' or token is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Token undefined'
+            )
         is_valid, payload = self.jwt.is_valid_token_and_get_payload(token)
 
         auth_token = self.token_db.get_by_field(token=token)
@@ -60,4 +63,8 @@ class Validator:
                 detail=ErrorResponse.INVALID_TOKEN
             )
 
-        return auth_token
+        return auth_token, payload
+
+
+def get_validator():
+    return Validator()

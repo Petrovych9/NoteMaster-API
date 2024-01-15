@@ -22,6 +22,7 @@ class JwtToken(BaseSettings):
     public_cert: str = str((Path(__file__).parent.parent / 'certs' / 'jwt-public.pem').read_text())
     algo: str = 'RS256'             # pyjwt docs for public and private keys
     life_time_sec: int = 360
+    long_life_time_sec: int = 3600
     type: str = 'Bearer'
 
 
@@ -34,6 +35,7 @@ class UrlsBase(BaseSettings):
 
 class UserEndpoints(UrlsBase):
     login: str = '/login'
+    refresh_token: str = '/refresh_token'
     user1: str = '/user'
 
     def get_url(self, endpoint: str):
