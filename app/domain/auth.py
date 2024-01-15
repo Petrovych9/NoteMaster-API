@@ -3,8 +3,7 @@ import datetime
 import jwt
 from jwt.exceptions import InvalidTokenError
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException, status
 
 from app.config import get_settings
 
@@ -23,6 +22,7 @@ class JwtToken:
             payload: dict,
             algorithm: str | None = None,
             private_key: str | bytes | None = None,
+            life_time_sec: int = 0
     ):
         if algorithm is None:
             algorithm = self.algorithm
@@ -30,9 +30,13 @@ class JwtToken:
         if private_key is None:
             private_key = self.private_key
 
-        now = datetime.datetime.utcnow()
-        expire = self.life_time_sec + now
-        payload.update(now=now, expire=expire)
+        if life_time_sec == 0:
+            life_time_sec = self.life_time_sec
+
+        now = datetime.datetime.now(tz=datetime.UTC)
+        expire = datetime.timedelta(seconds=life_time_sec) + now
+        payload.update(now=str(now), expire=str(expire))
+        print(payload)
 
         encoded_result = jwt.encode(
             payload=payload,
@@ -56,31 +60,46 @@ class JwtToken:
             public_key = self.public_key
 
         decoded_result = jwt.decode(
-            jwt_token=jwt_token,
+            jwt=jwt_token,
             key=public_key,
             algorithms=[algorithm]
         )
 
         return decoded_result
 
-    # def grand_jwt_token_via_login_url(self):
-    #     api_version = self.settings.urls.api_version_prefix
-    #     prefix = self.settings.urls.users_prefix
-    #     endpoint = self.settings.urls.users_endpoints.login
-    #     login_url = api_version + prefix + endpoint
-    #     print(login_url)
-    #     return OAuth2PasswordBearer(login_url)
+    def is_token_expire(self, expire: str):
+        expire = datetime.datetime.fromisoformat(expire)
+        now = datetime.datetime.now(datetime.UTC)
+        if now > expire or now == expire:
+            return True
+        return False
 
     def is_valid_token_and_get_payload(
             self,
             token: str
     ):
+        if token == 'undefined':
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Token undefined'
+            )
+
         try:
-            payload = jwt.decode(jwt_token=token)
+            payload = self.decode(jwt_token=token)
         except InvalidTokenError as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f'invalid token error: {e}'
             )
-
+        if payload.get('expire'):
+            expire = payload.get('expire')
+            if self.is_token_expire(expire=expire):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail='Token expire'
+                )
         return True, payload
+
+
+def get_jwt_token_class():
+    return JwtToken()
