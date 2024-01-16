@@ -1,7 +1,5 @@
-from typing import Annotated
-
 from app.domain.abc import UsersDatabaseCrud
-from app.domain.users_models import UserModelCreate, UserModel
+from app.domain.users_models import UserModelCreate
 from app.utilts import get_pass_hash
 
 

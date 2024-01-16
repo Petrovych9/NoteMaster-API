@@ -1,14 +1,13 @@
-from typing import Union, Tuple, Annotated
+from typing import Tuple
 
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
 
 from app.domain.error_models import ErrorResponse
 from app.domain.auth_models import AuthTokenModelCreate
-from app.domain.users_crud import UsersCrud, get_users_crud
-from app.domain.token_crud import AuthTokenCrud, get_token_crud
-from app.domain.auth import JwtToken, get_jwt_token_class
-from app.utilts import get_pass_hash
-from app.config import get_settings, Settings
+from app.domain.users_crud import get_users_crud
+from app.domain.token_crud import get_token_crud
+from app.domain.auth import get_jwt_token_class
+from app.config import get_settings
 
 
 class Validator:

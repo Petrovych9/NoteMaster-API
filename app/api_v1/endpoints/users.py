@@ -14,7 +14,6 @@ from app.utilts import get_pass_hash
 from app.config import get_settings, Settings
 
 
-
 users_router = APIRouter(
         prefix=get_settings().urls.users_prefix,
         tags=['users'],
