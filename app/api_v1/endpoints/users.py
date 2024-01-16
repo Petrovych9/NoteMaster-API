@@ -1,23 +1,20 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Body, APIRouter, status, Form
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, \
-    OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException, Body, APIRouter, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from app.domain.users_models import UserLoginForm, UserCreateForm
-from app.models import AuthToken
+from app.domain.users_models import UserCreateForm
 from app.domain.error_models import ErrorResponse
-from app.utilts import get_pass_hash
-from app.config import get_settings, Settings
 from app.domain.users_crud import get_users_crud, UsersCrud
 from app.domain.token_crud import AuthTokenCrud, get_token_crud
 from app.domain.auth_models import TokenInfo
 from app.domain.auth import JwtToken
 from app.domain.validation import Validator, get_validator
+from app.utilts import get_pass_hash
+from app.config import get_settings, Settings
 
 
-#     "email": "test1@gmail.cpom",
-#     "password": "string"
+
 users_router = APIRouter(
         prefix=get_settings().urls.users_prefix,
         tags=['users'],
@@ -78,11 +75,7 @@ async def login(
             detail=ErrorResponse.INTERNAL_ERR0R
         )
 
-    return TokenInfo(
-        access_token=token,
-        refresh_token=refresh_token,
-        token_type=settings.jwt.type,
-    )
+    return TokenInfo(access_token=token, refresh_token=refresh_token)
 
 
 @users_router.post(get_settings().urls.users_endpoints.refresh_token, name='refresh access token')
@@ -120,7 +113,7 @@ def refresh_access_token(
             detail=ErrorResponse.INTERNAL_ERR0R
         )
 
-    return TokenInfo(access_token=new_token, token_type='Bearer', refresh_token=refresh_token)
+    return TokenInfo(access_token=new_token, refresh_token=refresh_token)
 # todo need to link each refresh to each user and do not create always new token
 
 @users_router.post(get_settings().urls.users_endpoints.user1, name='user: create')

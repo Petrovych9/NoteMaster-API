@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from app.config import get_settings
+
 
 class AuthTokenModelCreate(BaseModel):
     token: str
@@ -9,4 +11,4 @@ class AuthTokenModelCreate(BaseModel):
 class TokenInfo(BaseModel):
     access_token: str
     refresh_token: str
-    token_type: str
+    token_type: str = get_settings().jwt.type

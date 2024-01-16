@@ -93,6 +93,7 @@ class JwtToken:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f'invalid token error: {e}'
             )
+
         if payload.get('expire'):
             expire = payload.get('expire')
             if self.is_token_expire(expire=expire):
