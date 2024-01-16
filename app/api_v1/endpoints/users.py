@@ -93,13 +93,13 @@ def refresh_access_token(
         jwt: JwtToken = Depends(JwtToken),
         validator: Validator = Depends(Validator),
 ):
-    is_valid, payload = validator.check_auth_token(token=refresh_token)
+    auth_token, payload = validator.check_auth_token(token=refresh_token)
 
     is_valid_user, user_id = validator.check_user(
         email=payload.get('email'),
         password=payload.get('password')
     )
-    if not is_valid or not is_valid_user:
+    if not auth_token or not is_valid_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=ErrorResponse.USER_NOT_FOUND

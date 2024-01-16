@@ -49,11 +49,6 @@ class Validator:
             token: str | None = None,
     ) -> Tuple[AuthTokenModelCreate, dict]:
 
-        if token == 'undefined' or token is None:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail='Token undefined'
-            )
         is_valid, payload = self.jwt.is_valid_token_and_get_payload(token)
 
         auth_token = self.token_db.get_by_field(token=token)
