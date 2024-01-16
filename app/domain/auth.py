@@ -33,6 +33,8 @@ class JwtToken:
         if life_time_sec == 0:
             life_time_sec = self.life_time_sec
 
+        payload = payload.copy()
+
         now = datetime.datetime.now(tz=datetime.UTC)
         expire = datetime.timedelta(seconds=life_time_sec) + now
         payload.update(now=str(now), expire=str(expire))
