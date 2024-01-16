@@ -82,6 +82,7 @@ async def login(
 @users_router.post(get_settings().urls.users_endpoints.refresh_token, name='refresh access token')
 def refresh_access_token(
         refresh_token: str,
+        update_refresh_token: bool = False,
         token_db: AuthTokenCrud = Depends(get_token_crud),
         settings: Settings = Depends(get_settings),
         jwt: JwtToken = Depends(JwtToken),
@@ -99,22 +100,30 @@ def refresh_access_token(
             detail=ErrorResponse.USER_NOT_FOUND
         )
 
-    new_token = jwt.encode(
+    new_access_token = jwt.encode(
         payload=dict(
             email=payload.get('email'),
             password=payload.get('password'),
         ),
-        life_time_sec=settings.jwt.long_life_time_sec
     )
-
-    auth_token_id = token_db.update(field_value=dict(token=new_token), user_id=user_id)
-    if not auth_token_id:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=ErrorResponse.INTERNAL_ERR0R
+    if update_refresh_token:
+        new_refresh_token = jwt.encode(
+            payload=dict(
+                email=payload.get('email'),
+                password=payload.get('password'),
+            ),
+            life_time_sec=settings.jwt.long_life_time_sec
         )
 
-    return TokenInfo(access_token=new_token, refresh_token=refresh_token)
+        auth_token_id = token_db.update(field_value=dict(token=new_refresh_token), user_id=user_id)
+        if not auth_token_id:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=ErrorResponse.INTERNAL_ERR0R
+            )
+        return TokenInfo(access_token=new_access_token, refresh_token=new_refresh_token)
+
+    return TokenInfo(access_token=new_access_token, refresh_token=refresh_token)
 
 @users_router.post(get_settings().urls.users_endpoints.user1, name='user: create')
 async def create_user(
