@@ -68,10 +68,7 @@ async def login(
         )
 
     auth_token = token_db.update(field_value=dict(token=refresh_token), user_id=user_id)
-    # print(user_id, "    ", auth_token.id, auth_token.token)
     if not auth_token:
-        #create auth token
-        print('AUTH TOKEN NOT FOUND')
         auth_token_id = token_db.create(token=refresh_token, user_id=user_id)
         if not auth_token_id:
             raise HTTPException(
