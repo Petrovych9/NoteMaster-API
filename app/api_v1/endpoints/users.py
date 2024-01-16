@@ -67,12 +67,17 @@ async def login(
             detail=ErrorResponse.INTERNAL_ERR0R
         )
 
-    auth_token_id = token_db.create(token=refresh_token, user_id=user_id)
-    if not auth_token_id:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=ErrorResponse.INTERNAL_ERR0R
-        )
+    auth_token = token_db.update(field_value=dict(token=refresh_token), user_id=user_id)
+    # print(user_id, "    ", auth_token.id, auth_token.token)
+    if not auth_token:
+        #create auth token
+        print('AUTH TOKEN NOT FOUND')
+        auth_token_id = token_db.create(token=refresh_token, user_id=user_id)
+        if not auth_token_id:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=ErrorResponse.INTERNAL_ERR0R
+            )
 
     return TokenInfo(access_token=token, refresh_token=refresh_token)
 
@@ -105,7 +110,7 @@ def refresh_access_token(
         life_time_sec=settings.jwt.long_life_time_sec
     )
 
-    auth_token_id = token_db.create(token=new_token, user_id=user_id)
+    auth_token_id = token_db.update(field_value=dict(token=new_token), user_id=user_id)
     if not auth_token_id:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -113,7 +118,6 @@ def refresh_access_token(
         )
 
     return TokenInfo(access_token=new_token, refresh_token=refresh_token)
-# todo need to link each refresh to each user and do not create always new token
 
 @users_router.post(get_settings().urls.users_endpoints.user1, name='user: create')
 async def create_user(

@@ -29,9 +29,16 @@ class AuthTokenCrud:
         auth_token_id = self.token_db.create(auth_token.model_dump())
         return auth_token_id
 
-    def update(self, token_id: int, field_value: dict):
+    def update(self, field_value: dict,  token_id: int = None, user_id: int = None):
+        filter_by = dict(
+            user_id=user_id
+        )
+        if token_id:
+            filter_by = dict(
+                token_id=token_id
+            )
         updated_user_id = self.token_db.update(
-            item_id=token_id,
+            filter_by=filter_by,
             field_value=field_value
         )
         return updated_user_id

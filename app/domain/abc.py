@@ -63,9 +63,9 @@ class DatabaseCrud(ABCCrud):
         except Exception as e:
             raise Exception(f"Unexpected error: {e}")
 
-    def update(self, item_id: int, field_value: dict):
+    def update(self, filter_by: dict, field_value: dict):
         with DatabaseSessionManager(self.tests) as session:
-            q = update(self.table).filter_by(id=item_id).values(**field_value).returning(self.table.id)
+            q = update(self.table).filter_by(**filter_by).values(**field_value).returning(self.table.id)
             res = session.execute(q)
             res = res.fetchone()
             session.commit()
