@@ -36,5 +36,6 @@ class AuthToken(Base):
     __tablename__ = 'auth_token'
     id: Mapped[int] = mapped_column(primary_key=True)
     token: Mapped[str]
+    expired: Mapped[str]
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     created_at: Mapped[str] = mapped_column(default=datetime.now())
