@@ -1,6 +1,6 @@
-from datetime import datetime
+import datetime
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum
+from sqlalchemy import ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -19,7 +19,7 @@ class User(Base):
     email: Mapped[str]
     password: Mapped[str]
     nickname: Mapped[str]
-    created_at: Mapped[str] = mapped_column(default=datetime.now())
+    created_at: Mapped[str] = mapped_column(default=datetime.datetime.now(datetime.UTC))
 
 
 class Note(Base):
@@ -36,6 +36,6 @@ class AuthToken(Base):
     __tablename__ = 'auth_token'
     id: Mapped[int] = mapped_column(primary_key=True)
     token: Mapped[str]
-    expired: Mapped[str]
+    expire: Mapped[str]
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    created_at: Mapped[str] = mapped_column(default=datetime.now())
+    created_at: Mapped[str] = mapped_column(default=datetime.datetime.now(datetime.UTC))

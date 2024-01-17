@@ -46,7 +46,7 @@ class JwtToken:
             algorithm=algorithm
         )
 
-        return encoded_result
+        return encoded_result, expire
 
     def decode(
             self,

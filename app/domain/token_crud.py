@@ -24,8 +24,12 @@ class AuthTokenCrud:
         token = self.token_db.get(field_value)
         return token
 
-    def create(self, token: str, user_id: int):
-        auth_token = AuthTokenModelCreate(token=token, user_id=user_id)
+    def create(self, token: str, user_id: int, expire: str):
+        auth_token = AuthTokenModelCreate(
+            token=token,
+            user_id=user_id,
+            expire=str(expire)
+        )
         auth_token_id = self.token_db.create(auth_token.model_dump())
         return auth_token_id
 

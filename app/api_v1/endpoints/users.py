@@ -46,13 +46,13 @@ async def login(
             detail=ErrorResponse.USER_NOT_FOUND
         )
 
-    token = jwt.encode(
+    token, _ = jwt.encode(
         payload=dict(
             email=user_form.username,
             password=hashed_pass
         )
     )
-    refresh_token = jwt.encode(
+    refresh_token, expire = jwt.encode(
         payload=dict(
             email=user_form.username,
             password=hashed_pass
@@ -67,9 +67,16 @@ async def login(
             detail=ErrorResponse.INTERNAL_ERR0R
         )
 
-    auth_token = token_db.update(field_value=dict(token=refresh_token), user_id=user_id)
+    auth_token = token_db.update(
+        field_value=dict(token=refresh_token, expire=expire),
+        user_id=user_id
+    )
     if not auth_token:
-        auth_token_id = token_db.create(token=refresh_token, user_id=user_id)
+        auth_token_id = token_db.create(
+            token=refresh_token,
+            user_id=user_id,
+            expire=expire
+        )
         if not auth_token_id:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -100,14 +107,14 @@ def refresh_access_token(
             detail=ErrorResponse.USER_NOT_FOUND
         )
 
-    new_access_token = jwt.encode(
+    new_access_token, _ = jwt.encode(
         payload=dict(
             email=payload.get('email'),
             password=payload.get('password'),
         ),
     )
     if update_refresh_token:
-        new_refresh_token = jwt.encode(
+        new_refresh_token, expire = jwt.encode(
             payload=dict(
                 email=payload.get('email'),
                 password=payload.get('password'),
@@ -115,7 +122,10 @@ def refresh_access_token(
             life_time_sec=settings.jwt.long_life_time_sec
         )
 
-        auth_token_id = token_db.update(field_value=dict(token=new_refresh_token), user_id=user_id)
+        auth_token_id = token_db.update(
+            field_value=dict(token=new_refresh_token, expire=expire),
+            user_id=user_id
+        )
         if not auth_token_id:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -124,6 +134,7 @@ def refresh_access_token(
         return TokenInfo(access_token=new_access_token, refresh_token=new_refresh_token)
 
     return TokenInfo(access_token=new_access_token, refresh_token=refresh_token)
+
 
 @users_router.post(get_settings().urls.users_endpoints.user1, name='user: create')
 async def create_user(
