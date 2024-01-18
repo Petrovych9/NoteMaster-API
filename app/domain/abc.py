@@ -1,14 +1,11 @@
 from abc import ABC, abstractmethod
-
-from sqlalchemy import insert, delete, select, update
 from typing import Type
 
+from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError, DataError, DBAPIError
 
-from app.models import Base
-
 from app.db import DatabaseSessionManager
-from app.models import User, Note, AuthToken
+from app.models import Base, User, Note, AuthToken, NoteCategory
 
 
 class ABCCrud(ABC):
@@ -87,6 +84,10 @@ class UsersDatabaseCrud(DatabaseCrud):
 
 class NotesDatabaseCrud(DatabaseCrud):
     table = Note
+
+
+class NoteCategoryDatabaseCrud(DatabaseCrud):
+    table = NoteCategory
 
 
 class AuthTokenDatabaseCrud(DatabaseCrud):

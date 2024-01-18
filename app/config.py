@@ -31,6 +31,7 @@ class UrlsBase(BaseSettings):
 
     users_prefix: str = '/users'
     notes_prefix: str = '/notes'
+    note_category_prefix: str = '/category'
 
 
 class UserEndpoints(UrlsBase):
@@ -56,10 +57,20 @@ class NoteEndpoints(UrlsBase):
         return f"{self.api_version_prefix + self.notes_prefix + endpoint}"
 
 
+class NoteCategoryEndpoints(UrlsBase):
+    create: str = '/create'
+    update: str = '/update'
+    delete: str = '/delete'
+
+    def get_url(self, endpoint: str):
+        return f"{self.api_version_prefix + self.notes_prefix +self.note_category_prefix + endpoint}"
+
+
 class Urls(UrlsBase):
     base_endpoints: BaseEndpoints = BaseEndpoints()
     users_endpoints: UserEndpoints = UserEndpoints()
     notes_endpoints: NoteEndpoints = NoteEndpoints()
+    notes_category: NoteCategoryEndpoints = NoteCategoryEndpoints()
 
 
 class Settings(BaseSettings):
