@@ -1,5 +1,7 @@
 from enum import Enum
 
+STATUS_OK = 'OK'
+
 
 class ErrorResponse(str, Enum):
     INVALID_EMAIL = 'INVALID_EMAIL'
