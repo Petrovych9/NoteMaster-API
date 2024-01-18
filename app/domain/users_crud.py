@@ -27,7 +27,7 @@ class UsersCrud:
         return user_id
 
     def update(self, user_id: int, field_value: dict):
-        filter_by = dict(user_id=user_id)
+        filter_by = dict(id=user_id)
         updated_user_id = self.user_db.update(
             filter_by=filter_by,
             field_value=field_value

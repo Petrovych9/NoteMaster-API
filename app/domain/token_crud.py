@@ -39,7 +39,7 @@ class AuthTokenCrud:
         )
         if token_id:
             filter_by = dict(
-                token_id=token_id
+                id=token_id
             )
         updated_user_id = self.token_db.update(
             filter_by=filter_by,
