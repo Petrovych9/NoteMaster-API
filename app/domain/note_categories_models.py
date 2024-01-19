@@ -24,9 +24,9 @@ class CreatedNoteCategoryResponse(BaseModel):
 
 
 class UpdateCategoryRequest(BaseModel):
-    category: str
-    new_name: Optional[NoteNamesDefault | str]
-    new_description: Optional[str]
+    category_name: str
+    new_name: Optional[NoteNamesDefault | str] = None
+    # new_description: Optional[str] = None
 
 
 class UpdateCategoryResponse(BaseModel):

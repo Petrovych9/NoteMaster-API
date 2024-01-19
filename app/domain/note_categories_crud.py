@@ -11,6 +11,11 @@ class NoteCategoryCrud:
         user = self.note_category_db.get(field_value)
         return user
 
+    def get_by_name(self, category_name: str):
+        field_value = dict(name=category_name)
+        category = self.note_category_db.get(field_value)
+        return category
+
     def create(self, category_model: m.CreateNoteCategoryRequest):
         category = category_model.model_dump()
         category_id = self.note_category_db.create(category)
@@ -27,7 +32,7 @@ class NoteCategoryCrud:
     def delete(self, category_id: int):
         try:
             self.note_category_db.delete(item_id=category_id)
-            return f'User with id: {category_id} has been deleted'
+            return f'Item with id: {category_id} has been deleted'
         except Exception:
             raise 'Del category error'
 
