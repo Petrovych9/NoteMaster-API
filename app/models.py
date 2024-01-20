@@ -4,7 +4,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
-from app.domain.note_categories_models import NoteNamesDefault
 
 
 class User(Base):
@@ -22,8 +21,8 @@ class Note(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     title: Mapped[str]
     content: Mapped[str]
-    category: Mapped[str] #= mapped_column(ForeignKey('notes_categories.id'))
-    status: Mapped[str] = mapped_column(default=NoteNamesDefault.personal.value)
+    category: Mapped[int] = mapped_column(ForeignKey('notes_categories.id'))
+    status: Mapped[str] = mapped_column(default=None)
 
 
 class NoteCategory(Base):

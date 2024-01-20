@@ -16,6 +16,10 @@ class Database(BaseSettings):
     test_db_name: str = Field('TEST_DB_NAME', env='TEST_DB_NAME')
     secret_key: str = Field('SECRET_KEY', env='SECRET_KEY')
 
+    user_postgres: str = Field('USER_POSTGRES', env='USER_POSTGRES')
+    pass_postgres: str = Field('PASS_POSTGRES', env='PASS_POSTGRES')
+    host_postgres: str = Field('HOST_POSTGRES', env='HOST_POSTGRES')
+
 
 class JwtToken(BaseSettings):
     private_cert: str = str((Path(__file__).parent.parent / 'certs' / 'jwt-private.pem').read_text())
@@ -77,7 +81,8 @@ class Settings(BaseSettings):
     app_name: str = 'NoteMaster-API'
     db: Database = Database()
 
-    db_url: str = f'sqlite:///{os.path.join(db.absolute_root_dir, db.db_name)}'
+    # db_url: str = f'sqlite:///{os.path.join(db.absolute_root_dir, db.db_name)}'
+    db_url: str = f'postgresql://{db.user_postgres}:{db.pass_postgres}@{db.host_postgres}/{db.db_name}'
     test_db_url: str = f"sqlite:///{os.path.join(db.absolute_root_dir, db.test_db_name)}"
 
     urls: Urls = Urls()

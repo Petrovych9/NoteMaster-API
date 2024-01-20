@@ -11,7 +11,7 @@ class Base(DeclarativeBase):
 def get_engine(url: str = get_settings().db_url):
     return create_engine(
         url,
-        connect_args={"check_same_thread": False},  # only for SQLite
+        # connect_args={"check_same_thread": False},  # only for SQLite
         echo=False
     )
 
