@@ -6,7 +6,7 @@ from enum import Enum
 from app.domain.error_models import STATUS_OK
 
 
-class NoteNamesDefault(Enum):
+class NoteCategoryNamesDefault(Enum):
     personal = 'personal'
     work = 'work'
     ideas = 'ideas'
@@ -14,7 +14,7 @@ class NoteNamesDefault(Enum):
 
 
 class CreateNoteCategoryRequest(BaseModel):
-    name: Optional[NoteNamesDefault | str] = NoteNamesDefault.personal.value
+    name: Optional[NoteCategoryNamesDefault | str] = NoteCategoryNamesDefault.personal.value
     description: Optional[str]
 
 
@@ -25,7 +25,7 @@ class CreatedNoteCategoryResponse(BaseModel):
 
 class UpdateCategoryRequest(BaseModel):
     category_name: str
-    new_name: Optional[NoteNamesDefault | str] = None
+    new_name: Optional[NoteCategoryNamesDefault | str] = None
     # new_description: Optional[str] = None
 
 
