@@ -14,8 +14,8 @@ class NoteCategoryNamesDefault(Enum):
 
 
 class CreateNoteCategoryRequest(BaseModel):
-    name: Optional[NoteCategoryNamesDefault | str] = NoteCategoryNamesDefault.personal.value
-    description: Optional[str]
+    name: NoteCategoryNamesDefault | str
+    description: Optional[str] = 'description'
 
 
 class CreatedNoteCategoryResponse(BaseModel):
@@ -26,7 +26,7 @@ class CreatedNoteCategoryResponse(BaseModel):
 class UpdateCategoryRequest(BaseModel):
     category_name: str
     new_name: Optional[NoteCategoryNamesDefault | str] = None
-    # new_description: Optional[str] = None
+    new_description: Optional[str] = None
 
 
 class UpdateCategoryResponse(BaseModel):

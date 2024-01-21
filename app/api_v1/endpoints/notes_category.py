@@ -46,10 +46,13 @@ async def update_category(
         settings: Settings = Depends(get_settings),
         validator: Validator = Depends(Validator),
 ):
-    updating_ex = HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=ErrorResponse.UPDATING_NOTE_CATEGORY_ERROR
-            )
+
+    if not (data.new_name or data.new_description):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Nothing to update'
+        )
+
     # check if category exist
     note_category = note_category_db.get_by_name(
         category_name=data.category_name
@@ -57,21 +60,24 @@ async def update_category(
     if not note_category:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Wrong category"
+            detail="Wrong category name"
         )
-    new_name = data.new_name
 
-    # check if new name available
-    if not data.new_name:
-        new_name = data.category_name
+    update_fields = {}
+    if data.new_name:
+        update_fields['name'] = data.new_name
+    if data.new_description:
+        update_fields['description'] = data.new_description
 
     updated_note_category_id = note_category_db.update(
         category_id=note_category.id,
-        # field_value=dict(name=new_name, description=data.new_description)
-        field_value=dict(name=new_name)
+        field_value=update_fields
     )
     if not updated_note_category_id:
-        raise updating_ex
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=ErrorResponse.UPDATING_NOTE_CATEGORY_ERROR
+        )
 
     return m.UpdateCategoryResponse()
 
