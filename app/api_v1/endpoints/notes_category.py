@@ -95,7 +95,7 @@ async def delete_category(
     if not note_category:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Wrong category"
+            detail="Wrong category name"
         )
 
     del_messege = note_category_db.delete(note_category.id)
