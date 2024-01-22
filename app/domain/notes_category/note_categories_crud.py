@@ -1,5 +1,5 @@
 from app.domain.abc import NoteCategoryDatabaseCrud
-from app.domain import note_categories_models as m
+from app.domain.notes_category import note_categories_models as m
 
 
 class NoteCategoryCrud:

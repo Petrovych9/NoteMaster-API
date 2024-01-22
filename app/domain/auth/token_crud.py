@@ -1,8 +1,6 @@
-from fastapi import Depends
-from typing import Annotated
 # from app.db import get_db_session
 from app.domain.abc import AuthTokenDatabaseCrud
-from app.domain.auth_models import AuthTokenModelCreate
+from app.domain.auth.auth_models import AuthTokenModelCreate
 
 
 class AuthTokenCrud:

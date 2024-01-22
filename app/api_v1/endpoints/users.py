@@ -3,12 +3,12 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, Body, APIRouter, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from app.domain.users_models import UserCreateForm
+from app.domain.users.users_models import UserCreateForm
 from app.domain.error_models import ErrorResponse
-from app.domain.users_crud import get_users_crud, UsersCrud
-from app.domain.token_crud import AuthTokenCrud, get_token_crud
-from app.domain.auth_models import TokenInfo
-from app.domain.auth import JwtToken
+from app.domain.users.users_crud import get_users_crud, UsersCrud
+from app.domain.auth.token_crud import AuthTokenCrud, get_token_crud
+from app.domain.auth.auth_models import TokenInfo
+from app.domain.auth.auth import JwtToken
 from app.domain.validation import Validator, get_validator
 from app.utilts import get_pass_hash
 from app.config import get_settings, Settings

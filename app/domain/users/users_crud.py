@@ -1,5 +1,5 @@
 from app.domain.abc import UsersDatabaseCrud
-from app.domain.users_models import UserModelCreate
+from app.domain.users.users_models import UserModelCreate
 from app.utilts import get_pass_hash
 
 
