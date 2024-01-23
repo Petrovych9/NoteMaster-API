@@ -13,10 +13,17 @@ def get_app(settings: Annotated[Settings, Depends(get_settings)]) -> FastAPI:
         prefix=settings.urls.api_version_prefix,
         # tags=['v1'],
     )
+
+    group_notes_router = APIRouter(
+        prefix=get_settings().urls.notes_prefix,
+        tags=['notes'],
+    )
+    group_notes_router.include_router(notes.notes_router)
+    group_notes_router.include_router(notes_category.note_category_router)
+
     v1.include_router(base.base_router)
     v1.include_router(users.users_router)
-    v1.include_router(notes.notes_router)
-    # v1.include_router(notes.notes_router.include_router(notes_category.note_category_router))
+    v1.include_router(group_notes_router)
 
     app.include_router(v1)
 
