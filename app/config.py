@@ -55,7 +55,9 @@ class BaseEndpoints(UrlsBase):
 
 
 class NoteEndpoints(UrlsBase):
-    pass
+    create: str = '/create'
+    update: str = '/update'
+    delete: str = '/delete'
 
     def get_url(self, endpoint: str):
         return f"{self.api_version_prefix + self.notes_prefix + endpoint}"
