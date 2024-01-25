@@ -18,11 +18,11 @@ class User(Base):
 class Note(Base):
     __tablename__ = 'notes'
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    title: Mapped[str]
-    content: Mapped[str]
-    category: Mapped[int] = mapped_column(ForeignKey('notes_categories.id'))
-    status: Mapped[str] = mapped_column(default=None)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    title: Mapped[str] = mapped_column(nullable=True)
+    content: Mapped[str] = mapped_column(nullable=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey('notes_categories.id'), nullable=True)
+    status: Mapped[str] = mapped_column(nullable=True, default=None)
 
 
 class NoteCategory(Base):
