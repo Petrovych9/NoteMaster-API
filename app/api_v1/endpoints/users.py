@@ -12,6 +12,7 @@ from app.domain.auth.auth import JwtToken
 from app.domain.validation import Validator, get_validator
 from app.utilts import get_pass_hash
 from app.config import get_settings, Settings
+from app.domain.helper import Helper, get_helper
 
 
 users_router = APIRouter(
@@ -169,23 +170,11 @@ async def get_user(
         user_db: UsersCrud = Depends(get_users_crud),
         token_db: AuthTokenCrud = Depends(get_token_crud),
         validator: Validator = Depends(get_validator),
+        helper: Helper = Depends(get_helper)
 ):
-    token, is_valid = validator.check_auth_token(token=str(token))
-
-    if not is_valid or not token:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=ErrorResponse.INVALID_TOKEN
-        )
-
-    user = user_db.get_by_id(
-        user_id=token_db.get_by_field(token=token.token).user_id
-    )
+    user = helper.get_current_user(token)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=ErrorResponse.USER_NOT_FOUND
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return {
         'id': user.id,
         'email': user.email,
