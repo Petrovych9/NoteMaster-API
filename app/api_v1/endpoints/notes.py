@@ -67,7 +67,12 @@ async def update_note(
         validator: Validator = Depends(Validator),
         helper: Helper = Depends(get_helper)
 ):
-    if not data.new_title and not data.new_content and not data.new_category:
+    if (
+        not data.new_title and
+        not data.new_content and
+        not data.new_category and
+        not data.status
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Nothing to update"
@@ -99,6 +104,9 @@ async def update_note(
                 detail=ErrorResponse.CREATING_NOTE_ERROR
             )
         update_fields['category_id'] = category_id
+
+    if data.status:
+        update_fields['status'] = data.status
 
     updated_note_id = note_db.update(
         note_id=note.id,

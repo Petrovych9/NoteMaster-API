@@ -37,6 +37,8 @@ class UpdateNoteRequest(BaseModel):
     new_content: Optional[str] = None
     new_category: Optional[str] | Optional[NoteCategoryNamesDefault] = None
 
+    status: Optional[NoteStatus] = None
+
 
 class UpdateNoteResponse(BaseModel):
     status: str = STATUS_OK
