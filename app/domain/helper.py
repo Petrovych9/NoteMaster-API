@@ -1,18 +1,15 @@
-from typing import Tuple, Annotated
-
 from fastapi import HTTPException, status, Depends
 
-
 from app.domain.error_models import ErrorResponse
-from app.domain.auth.auth_models import AuthTokenModelCreate
-from app.domain.notes_category.note_categories_models import \
-    CreateNoteCategoryRequest
+from app.domain.notes.note_models import NoteModel, NoteStatus
+from app.domain.notes_category.note_categories_models import CreateNoteCategoryRequest
 from app.domain.users.users_crud import get_users_crud
 from app.domain.auth.token_crud import get_token_crud
 from app.domain.auth.auth import get_jwt_token_class
 from app.domain.notes_category.note_categories_crud import get_notes_categories_crud
 from app.config import get_settings
 from app.domain.users.users_models import UserModel
+from app.models import Note
 
 
 class Helper:
@@ -29,17 +26,14 @@ class Helper:
             self,
             token: str,
     ) -> UserModel:
-        jwt = get_jwt_token_class()
-        users_crud = get_users_crud()
-
-        is_valid_token, decoded_payload = jwt.is_valid_token_and_get_payload(
+        is_valid_token, decoded_payload = self.jwt.is_valid_token_and_get_payload(
             token)
         if not is_valid_token or not decoded_payload:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail='Error during decoding token'
             )
-        user = users_crud.get_by_email(
+        user = self.user_db.get_by_email(
             user_email=decoded_payload.get('email')
         )
         if not user:
@@ -64,6 +58,16 @@ class Helper:
                 )
             return created_new_category_id
         return category.id
+
+    def convert_note_to_note_model(self, note: Note) -> NoteModel:
+        return NoteModel(
+            id=note.id,
+            title=note.title,
+            content=note.content,
+            category_id=note.category_id,
+            user_id=note.user_id,
+            status=NoteStatus(note.status) if note.status else None
+        )
 
 
 def get_helper():

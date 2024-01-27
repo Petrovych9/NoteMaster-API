@@ -1,15 +1,39 @@
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
 from app.domain.error_models import STATUS_OK
 from app.domain.notes_category.note_categories_models import NoteCategoryNamesDefault
 
+# TODO: need add data models for others entities
+class BaseModelResponse(BaseModel):
+    status: str = STATUS_OK
+
+
+class GetBase(BaseModelResponse):
+    total_documents: Optional[int] = None
+
 
 class NoteStatus(str, Enum):
     favorite = 'favorite'
     archived = 'archived'
+
+
+class Error(str, Enum):
+    WRONG_TITLE = "Wrong note's title"
+    WRONG_ID = "Wrong note's id"
+
+    GETTING_NOTES_ERROR = "GETTING_NOTES_ERROR"
+
+
+class NoteModel(BaseModel):
+    id: int
+    title: Optional[str]
+    content: Optional[str]
+    category_id: Optional[int] = None
+    user_id: int
+    status: Optional[NoteStatus] = None
 
 
 class CreateNoteRequest(BaseModel):
@@ -25,8 +49,7 @@ class CreateNoteDbModel(BaseModel):
     user_id: int
 
 
-class CreatedNoteResponse(BaseModel):
-    status: str = STATUS_OK
+class CreatedNoteResponse(BaseModelResponse):
     message: str = f"Note created"
 
 
@@ -40,8 +63,7 @@ class UpdateNoteRequest(BaseModel):
     status: Optional[NoteStatus] = None
 
 
-class UpdateNoteResponse(BaseModel):
-    status: str = STATUS_OK
+class UpdateNoteResponse(BaseModelResponse):
     message: str = f"Note updated"
 
 
@@ -50,11 +72,14 @@ class DeleteNoteRequest(BaseModel):
     note_id: int = None
 
 
-class DeleteNoteResponse(BaseModel):
-    status: str = STATUS_OK
+class DeleteNoteResponse(BaseModelResponse):
     message: str = f"Note deleted"
 
 
-class Error(str, Enum):
-    WRONG_TITLE = "Wrong note's title"
-    WRONG_ID = "Wrong note's id"
+class GetNotesRequest(BaseModel):
+    all: Optional[bool] = False
+    search_query: Optional[str] = None
+
+
+class GetNotesResponse(GetBase):
+    result: List[NoteModel]

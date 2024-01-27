@@ -158,3 +158,19 @@ async def delete_note(
         )
     return m.DeleteNoteResponse()
 
+
+@notes_router.post(get_settings().urls.notes_endpoints.get, name='note: get')
+async def get_notes(
+        data: m.GetNotesRequest,
+        note_db: NotesCrud = Depends(get_notes_crud),
+        settings: Settings = Depends(get_settings),
+        validator: Validator = Depends(Validator),
+):
+    if data.all:
+        notes = note_db.get_all()
+        return m.GetNotesResponse(total_documents=len(notes), result=notes)
+
+    if data.search_query:
+        notes = note_db.get_by_query(query=data.search_query)
+        return m.GetNotesResponse(total_documents=len(notes), result=notes)
+
