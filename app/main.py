@@ -17,6 +17,7 @@ def get_app(settings: Annotated[Settings, Depends(get_settings)]) -> FastAPI:
     group_notes_router = APIRouter(
         prefix=get_settings().urls.notes_prefix,
         tags=['notes'],
+        dependencies=[Depends(users.oauth_scheme)]  # lock all /notes endpoints
     )
     group_notes_router.include_router(notes.notes_router)
     group_notes_router.include_router(notes_category.note_category_router)
