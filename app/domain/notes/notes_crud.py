@@ -1,10 +1,12 @@
 from app.domain.abc import NotesDatabaseCrud
 from app.domain.notes import note_models as m
+from app.domain.helper import get_helper, Helper
 
 
 class NotesCrud:
     def __init__(self, note_db: NotesDatabaseCrud):
         self.note_db = note_db
+        self.helper = get_helper()
 
     def get_by_id(self, note_id: int):
         field_value = dict(id=note_id)
@@ -36,6 +38,23 @@ class NotesCrud:
         except Exception as e:
             raise f'Del note error: {e}'
 
+    def get_all(self):
+        """all notes from db"""
+        notes_object = self.note_db.select(all=True)
+        notes = [self.helper.convert_note_to_note_model(note) for note in notes_object]
+        print('ALL:', notes)
+        return notes
+
+    def get_all_by_user_id(self, user_id):
+        """all notes from specific user"""
+        return ...
+
+    def get_by_query(self, query: str):
+        """searching query across whole notes table"""
+        notes_object = self.note_db.select(search_query=query)
+        notes = [self.helper.convert_note_to_note_model(note) for note in notes_object]
+        print('ALL BY QUERY:', notes)
+        return notes
 
 def get_notes_crud():
     return NotesCrud(NotesDatabaseCrud())
