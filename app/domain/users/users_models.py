@@ -25,7 +25,7 @@ class RefreshAccessTokenRequest(BaseModel):
     update_refresh_token: bool = False,
 
 
-class RefreshAccessTokenResponse(BaseModel):
+class RefreshAccessTokenResponse(BaseModelResponse):
     access_token: str
     refresh_token: str
 

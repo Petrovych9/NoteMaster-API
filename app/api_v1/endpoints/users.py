@@ -7,7 +7,6 @@ from app.domain.users import users_models as m
 from app.domain.base_models import ErrorResponse
 from app.domain.users.users_crud import get_users_crud, UsersCrud
 from app.domain.auth.token_crud import AuthTokenCrud, get_token_crud
-from app.domain.auth.auth_models import TokenInfo
 from app.domain.auth.auth import JwtToken
 from app.domain.validation import Validator, get_validator
 from app.utilts import get_pass_hash
@@ -84,7 +83,7 @@ async def login(
                 detail=ErrorResponse.INTERNAL_ERR0R
             )
 
-    return TokenInfo(access_token=token, refresh_token=refresh_token)
+    return m.RefreshAccessTokenResponse(access_token=token, refresh_token=refresh_token)
 
 
 @users_router.post(get_settings().urls.users_endpoints.refresh_token, name='refresh access token')
