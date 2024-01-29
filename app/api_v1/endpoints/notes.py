@@ -8,7 +8,7 @@ from app.domain.notes.notes_crud import NotesCrud, get_notes_crud
 from app.domain.notes_category.note_categories_crud import NoteCategoryCrud, get_notes_categories_crud
 
 from app.domain.validation import Validator, get_validator
-from app.domain.error_models import ErrorResponse
+from app.domain.base_models import ErrorResponse
 
 from app.domain.helper import Helper, get_helper
 

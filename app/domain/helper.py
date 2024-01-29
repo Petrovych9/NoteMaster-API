@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status, Depends
 
-from app.domain.error_models import ErrorResponse
+from app.domain.base_models import ErrorResponse
 from app.domain.notes.note_models import NoteModel, NoteStatus
 from app.domain.notes_category.note_categories_models import CreateNoteCategoryRequest
 from app.domain.users.users_crud import get_users_crud

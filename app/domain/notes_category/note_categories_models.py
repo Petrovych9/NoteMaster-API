@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.domain.error_models import STATUS_OK
+from app.domain.base_models import STATUS_OK
 
 
 class NoteCategoryNamesDefault(Enum):

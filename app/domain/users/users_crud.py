@@ -1,5 +1,5 @@
 from app.domain.abc import UsersDatabaseCrud
-from app.domain.users.users_models import UserModelCreate
+from app.domain.users.users_models import CreateUserRequest
 from app.utilts import get_pass_hash
 
 
@@ -18,7 +18,7 @@ class UsersCrud:
         return user
 
     def create(self, email: str, password: str, nickname: str = 'nick'):
-        user = UserModelCreate(
+        user = CreateUserRequest(
             email=email,
             password=get_pass_hash(password),
             nickname=nickname

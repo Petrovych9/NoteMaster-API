@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel
 
 STATUS_OK = 'OK'
 
@@ -19,3 +22,11 @@ class ErrorResponse(str, Enum):
     CREATING_NOTE_ERROR = 'CREATING_NOTE_ERROR'
     UPDATING_NOTE_ERROR = 'UPDATING_NOTE_ERROR'
     DELETING_NOTE_ERROR = 'DELETING_NOTE_ERROR'
+
+
+class BaseModelResponse(BaseModel):
+    status: str = STATUS_OK
+
+
+class GetBase(BaseModelResponse):
+    total_documents: Optional[int] = None

@@ -3,16 +3,10 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
-from app.domain.error_models import STATUS_OK
+from app.domain.base_models import BaseModelResponse, GetBase
 from app.domain.notes_category.note_categories_models import NoteCategoryNamesDefault
 
 # TODO: need add data models for others entities
-class BaseModelResponse(BaseModel):
-    status: str = STATUS_OK
-
-
-class GetBase(BaseModelResponse):
-    total_documents: Optional[int] = None
 
 
 class NoteStatus(str, Enum):

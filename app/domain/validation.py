@@ -2,7 +2,7 @@ from typing import Tuple
 
 from fastapi import HTTPException, status
 
-from app.domain.error_models import ErrorResponse
+from app.domain.base_models import ErrorResponse
 from app.domain.auth.auth_models import AuthTokenModelCreate
 from app.domain.users.users_crud import get_users_crud
 from app.domain.auth.token_crud import get_token_crud

@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, APIRouter, status
 
 from app.domain.notes_category import note_categories_models as m
 from app.domain.notes_category.note_categories_crud import get_notes_categories_crud, NoteCategoryCrud
-from app.domain.error_models import ErrorResponse
+from app.domain.base_models import ErrorResponse
 from app.domain.validation import Validator
 from app.config import get_settings, Settings
 

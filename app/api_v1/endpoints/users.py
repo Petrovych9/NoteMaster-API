@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, Body, APIRouter, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from app.domain.users.users_models import UserCreateForm
-from app.domain.error_models import ErrorResponse
+from app.domain.users import users_models as m
+from app.domain.base_models import ErrorResponse
 from app.domain.users.users_crud import get_users_crud, UsersCrud
 from app.domain.auth.token_crud import AuthTokenCrud, get_token_crud
 from app.domain.auth.auth_models import TokenInfo
@@ -89,14 +89,13 @@ async def login(
 
 @users_router.post(get_settings().urls.users_endpoints.refresh_token, name='refresh access token')
 def refresh_access_token(
-        refresh_token: str,
-        update_refresh_token: bool = False,
+        data: m.RefreshAccessTokenRequest,
         token_db: AuthTokenCrud = Depends(get_token_crud),
         settings: Settings = Depends(get_settings),
         jwt: JwtToken = Depends(JwtToken),
         validator: Validator = Depends(Validator),
 ):
-    auth_token, payload = validator.check_auth_token(token=refresh_token)
+    auth_token, payload = validator.check_auth_token(token=data.refresh_token)
 
     is_valid_user, user_id = validator.check_user(
         email=payload.get('email'),
@@ -114,7 +113,7 @@ def refresh_access_token(
             password=payload.get('password'),
         ),
     )
-    if update_refresh_token:
+    if data.update_refresh_token:
         new_refresh_token, expire = jwt.encode(
             payload=dict(
                 email=payload.get('email'),
@@ -132,14 +131,17 @@ def refresh_access_token(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=ErrorResponse.INTERNAL_ERR0R
             )
-        return TokenInfo(access_token=new_access_token, refresh_token=new_refresh_token)
+        return m.RefreshAccessTokenResponse(access_token=new_access_token, refresh_token=new_refresh_token)
 
-    return TokenInfo(access_token=new_access_token, refresh_token=refresh_token)
+    return m.RefreshAccessTokenResponse(
+        access_token=new_access_token,
+        refresh_token=data.refresh_token
+    )
 
 
 @users_router.post(get_settings().urls.users_endpoints.user1, name='user: create')
 async def create_user(
-        user_form: UserCreateForm = Body(),
+        user_form: m.CreateUserRequest,
         user_db: UsersCrud = Depends(get_users_crud)
 ):
     is_user_exist = user_db.get_by_email(user_email=user_form.email)
@@ -158,25 +160,19 @@ async def create_user(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=ErrorResponse.INTERNAL_ERR0R
         )
-    return {
-        "status": status.HTTP_201_CREATED,
-        "user_id": user_id
-    }
+    return m.CreateUserResponse(user_id=user_id)
 
 
 @users_router.get(get_settings().urls.users_endpoints.user1, name='user: get')
 async def get_user(
         token: str = Depends(oauth_scheme),
-        user_db: UsersCrud = Depends(get_users_crud),
-        token_db: AuthTokenCrud = Depends(get_token_crud),
-        validator: Validator = Depends(get_validator),
         helper: Helper = Depends(get_helper)
 ):
     user = helper.get_current_user(token)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return {
-        'id': user.id,
-        'email': user.email,
-        'nickname': user.nickname
-    }
+    return m.GetUserResponse(
+        user_id=user.id,
+        email=user.email,
+        nickname=user.nickname
+    )

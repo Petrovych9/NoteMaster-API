@@ -4,7 +4,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.domain.error_models import ErrorResponse
+from app.domain.base_models import ErrorResponse
 from app.config import get_settings
 from app.domain.auth.token_crud import get_token_crud, AuthTokenCrud, get_test_token_crud
 from app.domain.users.users_crud import get_users_crud, UsersCrud, get_test_users_crud
