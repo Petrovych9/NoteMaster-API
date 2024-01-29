@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 from enum import Enum
 
-from app.domain.base_models import STATUS_OK
+from app.domain.base_models import BaseModelResponse
 
 
 class NoteCategoryNamesDefault(Enum):
@@ -18,8 +18,7 @@ class CreateNoteCategoryRequest(BaseModel):
     description: Optional[str] = 'description'
 
 
-class CreatedNoteCategoryResponse(BaseModel):
-    status: str = STATUS_OK
+class CreatedNoteCategoryResponse(BaseModelResponse):
     message: str = f"Category created"
 
 
@@ -29,8 +28,7 @@ class UpdateCategoryRequest(BaseModel):
     new_description: Optional[str] = None
 
 
-class UpdateCategoryResponse(BaseModel):
-    status: str = STATUS_OK
+class UpdateCategoryResponse(BaseModelResponse):
     message: str = f"Category updated"
 
 
@@ -38,6 +36,5 @@ class DeleteCategoryRequest(BaseModel):
     category: str
 
 
-class DeleteCategoryResponse(BaseModel):
-    status: str = STATUS_OK
+class DeleteCategoryResponse(BaseModelResponse):
     message: str = f"Category deleted"
