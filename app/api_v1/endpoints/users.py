@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Body, APIRouter, status
+from fastapi import Depends, HTTPException, APIRouter, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from app.domain.users import users_models as m
@@ -8,8 +8,8 @@ from app.domain.base_models import ErrorResponse
 from app.domain.users.users_crud import get_users_crud, UsersCrud
 from app.domain.auth.token_crud import AuthTokenCrud, get_token_crud
 from app.domain.auth.auth import JwtToken
-from app.domain.validation import Validator, get_validator
-from app.utilts import get_pass_hash
+from app.domain.validation import Validator
+from app.domain.users.utilts import get_pass_hash
 from app.config import get_settings, Settings
 from app.domain.helper import Helper, get_helper
 

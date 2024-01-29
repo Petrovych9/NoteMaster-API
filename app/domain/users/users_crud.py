@@ -1,6 +1,6 @@
 from app.domain.abc import UsersDatabaseCrud
 from app.domain.users.users_models import CreateUserRequest
-from app.utilts import get_pass_hash
+from app.domain.users.utilts import get_pass_hash
 
 
 class UsersCrud:
